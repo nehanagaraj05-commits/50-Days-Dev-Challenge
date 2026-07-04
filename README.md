@@ -2,8 +2,14 @@
 
 Welcome to the official repository for the **50-Day Development Challenge**, hosted by the core team at **Synexus**! 
 
-> **Our Core Philosophy:** *"Standard, not a trend. The Logic, not a language."* 
-> We believe programming isn't just about writing scripts; it's about solving actual problems. Over the next 50 days, we are getting our hands dirty with real-world full-stack development to build industry-ready skills.
+> **Our Core Philosophy:** *"Standard, not a trend. The Logic, not a language."* > We believe programming isn't just about writing scripts; it's about solving actual problems. Over the next 50 days, we are getting our hands dirty with real-world full-stack development to build industry-ready skills.
+
+---
+
+## 📝 Pre-Registration Required
+Before you write your first line of code, you **must officially register** to secure your spot, log your profiles for tracking, and ensure you qualify for the completion certificates.
+
+👉 **[Click Here to Fill Out the Registration Form](https://forms.gle/9fgE8f5BsK4iX4t16)**
 
 ---
 
@@ -61,4 +67,4 @@ Before **July 15**, make sure your environment is ready:
 ---
 
 ### ⚡ Ready to start? 
-Fork this repository, set up your workspace, and we will see you on Day 1! Drop a 🌟 on this repo if you are participating!
+Make sure you've submitted the form above, fork this repository, set up your workspace, and we will see you on Day 1! Drop a 🌟 on this repo if you are participating!
