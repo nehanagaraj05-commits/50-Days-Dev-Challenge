@@ -37,12 +37,13 @@ Now, we need to connect that GitHub repository to your physical computer.
 
 ## 📅 Phase 2: The Daily Workflow (Do this every day)
 
-Every day, a new task will be published in the **Master Challenge Repository**. Here is how you complete it:
+Every day, a new task will be published in the **50-Days-Dev-Challenge Repository**. Here is how you complete it:
 
 **Step 1: Find the Daily Task**
-* Open your web browser and navigate to the official Master Challenge Repository.
+* Open your web browser and navigate to the official 50-Days-Dev-Challenge Repository.
 * Click on the folder for that specific day (e.g., `Day-01`).
-* Read the `README.md` file inside. It contains the **Problem Statement**, the **Task Requirements**, and the **Core Concepts** you need to learn. 
+* Read the `README.md` file inside. It contains the **Problem Statement**, the **Task Requirements**, and the **Core Concepts** you need to learn.
+* Keep an eye on the supporter files given on each day that helps you get started with the task of the day.
 * *Read the provided documentation links before you write a single line of code.*
 
 **Step 2: Build the Solution Locally**
