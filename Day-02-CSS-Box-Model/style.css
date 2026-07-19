@@ -1,27 +1,20 @@
-/* ========================================== */
-/* DAY 2: CSS BOX MODEL & RESET               */
-/* ========================================== */
-
-/* 1. CSS VARIABLES (The Design System) */
-/* Hint: Define your colors and fonts here so you can reuse them easily */
-:root {
-    --primary-color: #0056b3; /* A professional blue, change it if you like! */
-    --text-color: #333333;
-    --bg-color: #ffffff;
-    --main-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* 2. THE UNIVERSAL RESET */
-/* Hint: Target everything (*) and remove default spacing */
 * {
-    /* Add your margin, padding, and box-sizing rules here */
-    
-
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* 3. BASE BODY STYLES */
+:root {
+  --primary-color: #4b6cb7;
+  --text-color: #2c2c2c;
+}
+
 body {
-    /* Apply your font family and background color variables here */
-    
-    
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-color);
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: var(--primary-color);
 }
