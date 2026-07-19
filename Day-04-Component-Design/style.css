@@ -1,52 +1,60 @@
-/* ========================================== */
-/* DAY 4: COMPONENT DESIGN (PROFILE CARDS)     */
-/* ========================================== */
-
-/* 1. THE PARENT GRID CONTAINER */
-.team-grid {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding: 40px 20px;
-    flex-wrap: wrap; /* Allows cards to drop to the next line if space runs out */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* 2. THE PROFILE CARD COMPONENT */
-/* Hint: Set the background, padding, borders, and text alignment here */
-.profile-card {
-    background-color: #ffffff;
-    text-align: center;
-    max-width: 280px;
-    width: 100%;
-    
-    /* Add your padding, border-radius, and box-shadow here */
-    
-
-    /* Optional: Add transition if you are attempting the bonus challenge */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+:root {
+  --primary-color: #4b6cb7;
+  --text-color: #2c2c2c;
 }
 
-/* 3. COMPONENT SUB-ELEMENTS */
-/* Hint: Handle the image size and make sure it stays circular or clean */
-.profile-card img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%; /* Makes the image a perfect circle */
-    object-fit: cover;
-    margin-top: 20px;
-    margin-bottom: 15px;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-color);
 }
 
-/* Enforce Visual Hierarchy: Name (Bold & Large) */
-.profile-card h3 {
-    font-size: 1.25rem;
-    color: var(--text-color);
-    margin-bottom: 5px;
+h1 {
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Enforce Visual Hierarchy: Role (Smaller & Lighter) */
-.profile-card p {
-    font-size: 0.95rem;
-    color: #666666; /* Subdued gray text */
-    margin-bottom: 20px;
+nav ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: var(--primary-color);
+}
+
+#home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  text-align: center;
+}
+
+#home h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: var(--primary-color);
 }
