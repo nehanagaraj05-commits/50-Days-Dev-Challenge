@@ -58,3 +58,51 @@ nav a:hover {
   margin-bottom: 20px;
   color: var(--primary-color);
 }
+.team-grid {
+  display: flex;
+  gap: 20px;
+  padding: 40px 50px;
+  flex-wrap: wrap;
+}
+
+.profile-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: hidden;
+  text-align: center;
+  flex: 1;
+  min-width: 200px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-card img {
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.profile-card h3 {
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 5px;
+}
+
+.profile-card p {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.profile-card a {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 600;
+}
