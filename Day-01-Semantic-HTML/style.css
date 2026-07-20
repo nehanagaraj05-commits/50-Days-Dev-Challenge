@@ -106,3 +106,25 @@ nav a:hover {
   color: var(--primary-color);
   font-weight: 600;
 }
+.initiatives-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 40px 50px;
+}
+
+.initiative-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.initiative-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.initiative-card.featured {
+  grid-column: span 2;
+}
