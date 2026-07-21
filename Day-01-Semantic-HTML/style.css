@@ -128,3 +128,93 @@ nav a:hover {
 .initiative-card.featured {
   grid-column: span 2;
 }
+.join-community {
+  padding: 60px 50px;
+  text-align: center;
+}
+
+.join-community h2 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.membership-form {
+  max-width: 500px;
+  margin: 30px auto 0;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group .required {
+  color: red;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+input:invalid:not(:placeholder-shown) {
+  border-color: red;
+}
+.btn-submit {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #3a5490;
+}
+
+.btn-submit:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .initiatives-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .initiatives-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  nav {
+    flex-direction: column;
+    padding: 15px 20px;
+  }
+
+  #home h1 {
+    font-size: 2rem;
+  }
+}
