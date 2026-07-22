@@ -1,0 +1,44 @@
+/* ========================================== */
+/* DAY 8: NATIVE CSS TRANSITIONS              */
+/* ========================================== */
+
+/* 1. BUTTON MICRO-INTERACTIONS */
+/* Target your primary buttons (e.g., in the Hero or Form) */
+button {
+    /* Set the base transition rules here. 
+       Notice we target specific properties, not 'all' */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    /* Lift the button up by 2 pixels */
+    transform: translateY(-2px);
+    
+    /* Slightly increase the shadow to match the lift */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    
+    /* Change your background color slightly here */
+}
+
+/* 2. ELEVATING PROFILE CARDS */
+/* Target the cards you built on Day 4 */
+.profile-card {
+    /* Add transition for transform and box-shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+    /* Lift the card by 5 pixels to make it feel tangible */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+/* 3. FLUID FORM INPUTS */
+/* Target the inputs you built on Day 7 */
+input, textarea {
+    /* Make the border color fade in smoothly rather than snapping */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* The focus state styling remains the same as Day 7, 
+   but now it will animate thanks to the base transition above! */
