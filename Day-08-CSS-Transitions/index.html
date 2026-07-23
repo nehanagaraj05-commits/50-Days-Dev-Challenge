@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Standard Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Title -->
+    <title>Community Platform | Day 01</title>
+
+    <!-- CSS Link (For Day 02, leaving it commented out for now) -->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+  </head>
+  <body>
+    <!-- ========================================== -->
+    <!-- YOUR DAY 1 ARCHITECTURE STARTS BELOW HERE  -->
+    <!-- ========================================== -->
+
+    <header role="banner">
+      <nav role="navigation">
+        <div class="logo">CommunityPlatform</div>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#initiatives">Initiatives</a></li>
+          <li><a href="#core-team">Core Team</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hint: Start with your Header and Navigation! -->
+    <main role="main">
+      <section id="home">
+        <h1>Empowering the Next Generation of Engineers</h1>
+        <a href="#initiatives">Explore Our Initiatives</a>
+      </section>
+
+      <section id="about">
+        <h2>About Us</h2>
+        <p>
+          We are a group of student engineers building, learning, and shipping
+          projects together — turning curiosity into real-world skill.
+        </p>
+      </section>
+
+      <section id="initiatives">
+        <h2>Our Initiatives</h2>
+        <div class="initiatives-grid">
+          <div class="initiative-card featured">
+            <h3>50 Days Web Dev Challenge</h3>
+            <p>
+              A daily challenge where members build one web development concept
+              at a time, from raw HTML to full MERN stack apps.
+            </p>
+          </div>
+          <div class="initiative-card">
+            <h3>Open Source Fridays</h3>
+            <p>
+              Weekly sessions where members contribute to real open-source
+              projects together.
+            </p>
+          </div>
+          <div class="initiative-card">
+            <h3>Hackathon Prep Series</h3>
+            <p>
+              Mock hackathons to sharpen speed, teamwork, and rapid prototyping
+              skills.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="core-team">
+        <h2>Core Team</h2>
+        <div class="team-grid">
+          <div class="profile-card">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Team member photo"
+            />
+            <h3>Aditi Sharma</h3>
+            <p>Chief Strategic Officer</p>
+            <a href="#">View Profile</a>
+          </div>
+          <div class="profile-card">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Team member photo"
+            />
+            <h3>Rohan Mehta</h3>
+            <p>Head of Engineering</p>
+            <a href="#">View Profile</a>
+          </div>
+          <div class="profile-card">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="Team member photo"
+            />
+            <h3>Priya Nair</h3>
+            <p>Community Lead</p>
+            <a href="#">View Profile</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="join-community" id="join">
+        <h2>Join The Engineering Community</h2>
+        <p>Standard, not a trend. Build with us.</p>
+
+        <form class="membership-form" action="#" method="POST">
+          <div class="form-group">
+            <label for="fullName"
+              >Full Name <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              placeholder="Jane Doe"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="emailAddress"
+              >Student Email <span class="required">*</span></label
+            >
+            <input
+              type="email"
+              id="emailAddress"
+              name="emailAddress"
+              placeholder="jane@student.edu"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="motivation">Why do you want to join?</label>
+            <textarea
+              id="motivation"
+              name="motivation"
+              rows="4"
+              placeholder="I want to solve actual problems..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">Submit Application</button>
+        </form>
+      </section>
+    </main>
+
+    <footer role="contentinfo">
+      <p>&copy; 2026 Synexus Community. All rights reserved.</p>
+      <ul>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">GitHub</a></li>
+      </ul>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- YOUR DAY 1 ARCHITECTURE ENDS ABOVE HERE    -->
+    <!-- ========================================== -->
+  </body>
+</html>
