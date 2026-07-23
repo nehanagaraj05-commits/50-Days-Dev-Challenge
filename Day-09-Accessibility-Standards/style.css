@@ -1,0 +1,30 @@
+/* ========================================== */
+/* DAY 9: ACCESSIBILITY (A11Y) STANDARDS      */
+/* ========================================== */
+
+/* 1. THE SKIP-TO-CONTENT LINK */
+/* Visually hide the link, pushing it off the screen */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 15px;
+    z-index: 100;
+    transition: top 0.3s ease;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* When a keyboard user hits "Tab" and focuses it, drop it into view! */
+.skip-link:focus {
+    top: 0;
+}
+
+/* 2. KEYBOARD FOCUS VISIBILITY */
+/* This targets elements focused specifically by a keyboard (not a mouse click) */
+:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px; /* Pushes the outline slightly away from the element */
+}
