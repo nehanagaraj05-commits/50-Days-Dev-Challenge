@@ -201,7 +201,27 @@ input:invalid:not(:placeholder-shown) {
   background-color: #aaa;
   cursor: not-allowed;
 }
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 8px 15px;
+  z-index: 100;
+  transition: top 0.3s ease;
+  text-decoration: none;
+  font-weight: bold;
+}
 
+.skip-link:focus {
+  top: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 3px;
+}
 @media (max-width: 900px) {
   .initiatives-grid {
     grid-template-columns: repeat(2, 1fr);
