@@ -7,17 +7,73 @@
 :root {
   --primary-color: #4b6cb7;
   --text-color: #2c2c2c;
+  --accent-color: #ff7e5f;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", Arial, Helvetica, sans-serif;
   color: var(--text-color);
+  line-height: 1.6;
+}
+p {
+  color: #555;
+  font-size: 1.05rem;
 }
 
 h1 {
+  font-family: "Poppins", sans-serif;
   margin-bottom: 20px;
   color: var(--primary-color);
 }
+
+main h2 {
+  font-family: "Poppins", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: 0.3px;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 40px;
+}
+main h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 60px;
+  height: 4px;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+}
+
+#about,
+#initiatives,
+#core-team,
+#join {
+  text-align: center;
+}
+
+#about h2,
+#initiatives h2,
+#core-team h2,
+#join h2 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#about h2::after,
+#initiatives h2::after,
+#core-team h2::after,
+#join h2::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ============================================= */
+/* --- NAVIGATION ---                            */
+/* ============================================= */
 nav {
   display: flex;
   justify-content: space-between;
@@ -43,6 +99,9 @@ nav a:hover {
   color: var(--primary-color);
 }
 
+/* ============================================= */
+/* --- HERO ---                                  */
+/* ============================================= */
 #home {
   display: flex;
   flex-direction: column;
@@ -58,11 +117,36 @@ nav a:hover {
   margin-bottom: 20px;
   color: var(--primary-color);
 }
+
+.btn-cta {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(75, 108, 183, 0.3);
+}
+
+.btn-cta:hover {
+  background-color: #3a5490;
+  transform: translateY(-2px);
+}
+
+/* ============================================= */
+/* --- CORE TEAM / PROFILE CARDS ---             */
+/* ============================================= */
 .team-grid {
   display: flex;
   gap: 20px;
   padding: 40px 50px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .profile-card {
@@ -106,6 +190,10 @@ nav a:hover {
   color: var(--primary-color);
   font-weight: 600;
 }
+
+/* ============================================= */
+/* --- INITIATIVES GRID ---                      */
+/* ============================================= */
 .initiatives-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -125,17 +213,16 @@ nav a:hover {
   margin-bottom: 10px;
 }
 
-.initiative-card.featured {
-  grid-column: span 2;
-}
+/* ============================================= */
+/* --- MEMBERSHIP FORM ---                       */
+/* ============================================= */
 .join-community {
   padding: 60px 50px;
   text-align: center;
 }
 
 .join-community h2 {
-  color: var(--primary-color);
-  margin-bottom: 10px;
+  color: var(--text-color);
 }
 
 .membership-form {
@@ -178,6 +265,7 @@ textarea:focus {
 input:invalid:not(:placeholder-shown) {
   border-color: red;
 }
+
 .btn-submit {
   background-color: var(--primary-color);
   color: #fff;
@@ -201,6 +289,41 @@ input:invalid:not(:placeholder-shown) {
   background-color: #aaa;
   cursor: not-allowed;
 }
+
+footer {
+  background-color: #1f2937;
+  color: #d1d5db;
+  width: 100%;
+  padding: 40px 50px;
+  text-align: center;
+}
+
+footer p {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+footer ul {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  list-style: none;
+}
+
+footer a {
+  color: #d1d5db;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: var(--primary-color);
+}
+
+/* ============================================= */
+/* --- ACCESSIBILITY ---                         */
+/* ============================================= */
 .skip-link {
   position: absolute;
   top: -40px;
@@ -222,6 +345,10 @@ input:invalid:not(:placeholder-shown) {
   outline: 3px solid var(--primary-color);
   outline-offset: 3px;
 }
+
+/* ============================================= */
+/* --- MEDIA QUERIES (always last) ---           */
+/* ============================================= */
 @media (max-width: 900px) {
   .initiatives-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -240,5 +367,10 @@ input:invalid:not(:placeholder-shown) {
 
   #home h1 {
     font-size: 2rem;
+  }
+
+  footer ul {
+    flex-direction: column;
+    gap: 10px;
   }
 }
