@@ -98,7 +98,14 @@ nav a {
 nav a:hover {
   color: var(--primary-color);
 }
-
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--text-color);
+}
 /* ============================================= */
 /* --- HERO ---                                  */
 /* ============================================= */
@@ -358,10 +365,19 @@ footer a:hover {
   }
 }
 
-@media (max-width: 600px) {
-  .initiatives-grid {
-    grid-template-columns: repeat(1, 1fr);
-  }
+.menu-toggle {
+    display: block;
+}
+
+nav ul {
+    display: none;
+    width: 100%;
+}
+
+nav ul.nav-active {
+    display: flex;
+    flex-direction: column;
+}
 
   nav {
     flex-direction: column;
