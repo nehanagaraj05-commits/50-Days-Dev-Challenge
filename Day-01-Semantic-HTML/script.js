@@ -1,19 +1,45 @@
 /* ========================================== */
-/* DAY 11: DOM FUNDAMENTALS & EVENTS          */
+/* DAY 12: MOBILE MENU TOGGLE LOGIC           */
 /* ========================================== */
 
-console.log("Synexus Engine Initialized. Ready for logic.");
+const menuToggle = document.querySelector(".menu-toggle");
+const navLinksContainer = document.querySelector("nav ul");
 
-// 1. DOM SELECTION
-const heroHeadline = document.querySelector('#home h1');
-const heroButton = document.querySelector('.btn-cta');
+if (menuToggle && navLinksContainer) {
+  menuToggle.addEventListener("click", () => {
+    navLinksContainer.classList.toggle("nav-active");
 
-// 2. EVENT LISTENER
-heroButton.addEventListener('click', function() {
+    const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", !isExpanded);
+  });
+}
+/* ========================================== */
+/* DAY 13: FORM VALIDATION LOGIC              */
+/* ========================================== */
 
-    // 3. DOM MANIPULATION
-    heroHeadline.textContent = 'Welcome to the Synexus Core!';
+const membershipForm = document.querySelector(".membership-form");
+const nameInput = document.getElementById("fullName");
+const emailInput = document.getElementById("emailAddress");
 
-    // Bonus Challenge
-    heroHeadline.classList.toggle('active-state');
-});
+if (membershipForm) {
+  membershipForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const nameValue = nameInput.value.trim();
+    const emailValue = emailInput.value.trim();
+
+    if (nameValue === "") {
+      console.log("Error: Name cannot be blank.");
+      nameInput.style.borderColor = "red";
+    } else if (!emailValue.includes("@")) {
+      console.log("Error: Please enter a valid email address.");
+      emailInput.style.borderColor = "red";
+    } else {
+      console.log("Success! Application Data:", { nameValue, emailValue });
+
+      nameInput.style.borderColor = "#ccc";
+      emailInput.style.borderColor = "#ccc";
+      membershipForm.reset();
+    }
+  });
+}
