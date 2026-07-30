@@ -200,7 +200,16 @@ nav a:hover {
   color: var(--primary-color);
   font-weight: 600;
 }
-
+#search-projects {
+  display: block;
+  max-width: 400px;
+  margin: 0 auto 30px;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
 /* ============================================= */
 /* --- INITIATIVES GRID ---                      */
 /* ============================================= */
@@ -222,7 +231,24 @@ nav a:hover {
   color: var(--primary-color);
   margin-bottom: 10px;
 }
+.status-active {
+  border-left: 4px solid #22c55e;
+}
 
+.status-completed {
+  border-left: 4px solid #9ca3af;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #f3f4f6;
+  color: #555;
+}
 /* ============================================= */
 /* --- MEMBERSHIP FORM ---                       */
 /* ============================================= */

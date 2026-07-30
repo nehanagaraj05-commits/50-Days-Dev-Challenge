@@ -43,3 +43,69 @@ if (membershipForm) {
     }
   });
 }
+/* ========================================== */
+/* DAY 15: ARRAY FILTERING & SEARCH           */
+/* ========================================== */
+
+const projectsData = [
+  {
+    title: "Project StoreLane",
+    description:
+      "A phygital hyperlocal commerce platform designed to digitize small local vendors.",
+    status: "Active",
+  },
+  {
+    title: "QR Attendance Tracker",
+    description:
+      "Automated student attendance system utilizing progressive web app (PWA) tech and real-time scanning.",
+    status: "Active",
+  },
+  {
+    title: "Logistics Management System",
+    description:
+      "Desktop architecture built for tracking shipments and driver status in real-time.",
+    status: "Completed",
+  },
+];
+
+const gridContainer = document.getElementById("dynamic-grid");
+const searchInput = document.getElementById("search-projects");
+
+function renderProjects(dataArray) {
+  if (!gridContainer) return;
+
+  gridContainer.innerHTML = "";
+
+  if (dataArray.length === 0) {
+    gridContainer.innerHTML = "<p>No initiatives match your search.</p>";
+    return;
+  }
+
+  dataArray.forEach(function (project) {
+    const statusClass =
+      project.status === "Active" ? "status-active" : "status-completed";
+
+    const cardHTML = `
+            <div class="initiative-card ${statusClass}">
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
+                <span class="badge">${project.status}</span>
+            </div>
+        `;
+    gridContainer.innerHTML += cardHTML;
+  });
+}
+
+renderProjects(projectsData);
+
+if (searchInput) {
+  searchInput.addEventListener("input", function () {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    const filteredProjects = projectsData.filter((project) =>
+      project.title.toLowerCase().includes(searchTerm),
+    );
+
+    renderProjects(filteredProjects);
+  });
+}
