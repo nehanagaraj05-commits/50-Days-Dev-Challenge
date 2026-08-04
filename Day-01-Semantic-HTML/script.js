@@ -158,3 +158,48 @@ if (themeToggleBtn) {
     localStorage.setItem("synexus_theme", theme);
   });
 }
+/* ========================================== */
+/* DAY 18: TIMERS & THE EVENT LOOP            */
+/* ========================================== */
+
+const testimonialsData = [
+  {
+    name: "Harshit Singh",
+    quote:
+      "Synexus changed how I approach engineering. It's about logic, not just languages.",
+  },
+  {
+    name: "Vipul Suthar",
+    quote:
+      "Building real-world architecture in this community has been a game changer.",
+  },
+  {
+    name: "Abhay Aditya R S",
+    quote:
+      "The focus on standard protocols over fleeting trends is exactly what the industry needs.",
+  },
+];
+
+const testimonialName = document.getElementById("testimonial-name");
+const testimonialQuote = document.getElementById("testimonial-quote");
+
+let currentIndex = 0;
+
+function updateTestimonial() {
+  if (!testimonialName || !testimonialQuote) return;
+
+  const currentData = testimonialsData[currentIndex];
+
+  testimonialName.textContent = currentData.name;
+  testimonialQuote.textContent = currentData.quote;
+
+  currentIndex++;
+
+  if (currentIndex >= testimonialsData.length) {
+    currentIndex = 0;
+  }
+}
+
+updateTestimonial();
+
+const carouselTimer = setInterval(updateTestimonial, 3000);

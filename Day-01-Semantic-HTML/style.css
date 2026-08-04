@@ -260,6 +260,26 @@ nav a:hover {
   background-color: #f3f4f6;
   color: #555;
 }
+#testimonials {
+  padding: 60px 50px;
+  text-align: center;
+  background-color: var(--card-bg);
+}
+
+#testimonial-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#testimonial-name {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+#testimonial-quote {
+  font-style: italic;
+  font-size: 1.1rem;
+}
 /* ============================================= */
 /* --- MEMBERSHIP FORM ---                       */
 /* ============================================= */
