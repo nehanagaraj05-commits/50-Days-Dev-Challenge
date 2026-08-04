@@ -21,6 +21,25 @@ const membershipForm = document.querySelector(".membership-form");
 const nameInput = document.getElementById("fullName");
 const emailInput = document.getElementById("emailAddress");
 
+// Day 16: Restore saved draft on page load
+const savedDraft = localStorage.getItem("synexus_form_draft");
+
+if (savedDraft) {
+  const parsedData = JSON.parse(savedDraft);
+  nameInput.value = parsedData.name;
+  emailInput.value = parsedData.email;
+}
+
+function saveProgress() {
+  const draftData = {
+    name: nameInput.value,
+    email: emailInput.value,
+  };
+  localStorage.setItem("synexus_form_draft", JSON.stringify(draftData));
+}
+
+nameInput.addEventListener("input", saveProgress);
+emailInput.addEventListener("input", saveProgress);
 if (membershipForm) {
   membershipForm.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -39,7 +58,9 @@ if (membershipForm) {
 
       nameInput.style.borderColor = "#ccc";
       emailInput.style.borderColor = "#ccc";
+
       membershipForm.reset();
+      localStorage.removeItem("synexus_form_draft"); // Day 16: clear saved draft
     }
   });
 }
@@ -107,5 +128,33 @@ if (searchInput) {
     );
 
     renderProjects(filteredProjects);
+  });
+}
+/* ========================================== */
+/* DAY 17: THEME TOGGLE & STATE PERSISTENCE   */
+/* ========================================== */
+
+const themeToggleBtn = document.getElementById("theme-toggle");
+
+const currentTheme = localStorage.getItem("synexus_theme");
+
+if (currentTheme === "dark") {
+  document.body.classList.add("dark-theme");
+  themeToggleBtn.textContent = "☀️";
+}
+
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", function () {
+    document.body.classList.toggle("dark-theme");
+
+    let theme = "light";
+    if (document.body.classList.contains("dark-theme")) {
+      theme = "dark";
+      themeToggleBtn.textContent = "☀️";
+    } else {
+      themeToggleBtn.textContent = "🌙";
+    }
+
+    localStorage.setItem("synexus_theme", theme);
   });
 }

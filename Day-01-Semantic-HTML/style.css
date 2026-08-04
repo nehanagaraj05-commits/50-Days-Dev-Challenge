@@ -8,12 +8,23 @@
   --primary-color: #4b6cb7;
   --text-color: #2c2c2c;
   --accent-color: #ff7e5f;
+  --bg-color: #ffffff;
+  --card-bg: #ffffff;
 }
-
+.dark-theme {
+  --primary-color: #4b6cb7;
+  --text-color: #f1f1f1;
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+}
 body {
   font-family: "Inter", Arial, Helvetica, sans-serif;
+  background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 p {
   color: #555;
@@ -160,7 +171,7 @@ nav a:hover {
 }
 
 .profile-card {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
@@ -221,7 +232,7 @@ nav a:hover {
 }
 
 .initiative-card {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
