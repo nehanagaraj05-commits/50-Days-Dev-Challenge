@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Standard Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Title -->
+    <title>Community Platform | Day 01</title>
+
+    <!-- CSS Link (For Day 02, leaving it commented out for now) -->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <!-- ========================================== -->
+    <!-- YOUR DAY 1 ARCHITECTURE STARTS BELOW HERE  -->
+    <!-- ========================================== -->
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header role="banner">
+      <nav role="navigation">
+        <button class="menu-toggle" ...>☰</button>
+<button id="theme-toggle">🌙</button>
+<ul>
+        <div class="logo">CommunityPlatform</div>
+        <button
+          class="menu-toggle"
+          aria-label="Toggle Menu"
+          aria-expanded="false"
+        >
+          ☰
+        </button>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#initiatives">Initiatives</a></li>
+          <li><a href="#core-team">Core Team</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hint: Start with your Header and Navigation! -->
+    <main role="main" id="main-content">
+      <section id="home">
+        <h1>Empowering the Next Generation of Engineers</h1>
+        <a href="#initiatives" class="btn-cta">Explore Our Initiatives</a>
+      </section>
+
+      <section id="about">
+        <h2>About Us</h2>
+        <p>
+          We are a group of student engineers building, learning, and shipping
+          projects together — turning curiosity into real-world skill.
+        </p>
+      </section>
+
+      <section id="initiatives">
+        <h2>Our Initiatives</h2>
+        <input
+          type="text"
+          id="search-projects"
+          placeholder="Search initiatives..."
+        />
+        <div class="initiatives-grid" id="dynamic-grid"></div>
+      </section>
+
+      <section id="core-team">
+        <h2>Core Team</h2>
+        <div class="team-grid">
+          <div class="profile-card">
+            <img src="anant.jfif" alt="ANANT SHARMA, Founder Synexus" />
+
+            <h3>Anant Sharma</h3>
+            <p>Founder, Synexus</p>
+            <a href="#">View Profile</a>
+          </div>
+          <div class="profile-card">
+            <img
+              src="abhay1.jfif"
+              alt="ABHAY ADITHYA R S, Chief Coordination Officer"
+            />
+            <h3>ABHAY ADITHYA R S</h3>
+            <p>Chief Coordination Officer, Synexus</p>
+            <a href="#">View Profile</a>
+          </div>
+          <div class="profile-card">
+            <img
+              src="pavithra.jfif"
+              alt="P V PAVITHRA, Chief Operating Officer"
+            />
+            <h3>P V PAVITHRA</h3>
+            <p>Chief Operating Officer, Synexus</p>
+            <a href="#">View Profile</a>
+          </div>
+          <div class="profile-card">
+            <img src="harshit.jfif" alt="HARSHIT SINGH, Community Lead" />
+            <h3>HARSHIT SINGH</h3>
+            <p>Community Lead, Synexus</p>
+            <a href="#">View Profile</a>
+          </div>
+        </div>
+      </section>
+      <section id="testimonials">
+    <h2>Community Testimonials</h2>
+    <div id="testimonial-container">
+        <h3 id="testimonial-name"></h3>
+        <p id="testimonial-quote"></p>
+    </div>
+</section>
+      <section class="join-community" id="join">
+        <h2>Join The Engineering Community</h2>
+        <p>Standard, not a trend. Build with us.</p>
+
+        <form class="membership-form" action="#" method="POST">
+          <div class="form-group">
+            <label for="fullName"
+              >Full Name <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              placeholder="Jane Doe"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="emailAddress"
+              >Student Email <span class="required">*</span></label
+            >
+            <input
+              type="email"
+              id="emailAddress"
+              name="emailAddress"
+              placeholder="jane@student.edu"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="motivation">Why do you want to join?</label>
+            <textarea
+              id="motivation"
+              name="motivation"
+              rows="4"
+              placeholder="I want to solve actual problems..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">Submit Application</button>
+        </form>
+      </section>
+    </main>
+
+    <footer role="contentinfo">
+      <p>&copy; 2026 Synexus Community. All rights reserved.</p>
+      <ul>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">GitHub</a></li>
+      </ul>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- YOUR DAY 1 ARCHITECTURE ENDS ABOVE HERE    -->
+    <!-- ========================================== -->
+  </body>
+</html>
