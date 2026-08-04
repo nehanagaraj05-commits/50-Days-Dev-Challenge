@@ -111,6 +111,7 @@ function renderProjects(dataArray) {
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
                 <span class="badge">${project.status}</span>
+<button class="view-btn" data-title="${project.title}">View Details</button>
             </div>
         `;
     gridContainer.innerHTML += cardHTML;
@@ -164,12 +165,16 @@ if (themeToggleBtn) {
 
 const testimonialsData = [
   {
+    name: "Anant Sharma",
+    quote: "It's about logic, not just languages.",
+  },
+  {
     name: "Harshit Singh",
     quote:
       "Synexus changed how I approach engineering. It's about logic, not just languages.",
   },
   {
-    name: "Vipul Suthar",
+    name: "P V Pavithra",
     quote:
       "Building real-world architecture in this community has been a game changer.",
   },
@@ -203,3 +208,39 @@ function updateTestimonial() {
 updateTestimonial();
 
 const carouselTimer = setInterval(updateTestimonial, 3000);
+/* ========================================== */
+/* DAY 19: EVENT DELEGATION & MODALS          */
+/* ========================================== */
+
+const projectModal = document.getElementById("project-modal");
+const modalTitle = document.getElementById("modal-title");
+const closeModalBtn = document.getElementById("close-modal");
+
+if (gridContainer) {
+  gridContainer.addEventListener("click", function (e) {
+    const clickedButton = e.target.closest(".view-btn");
+    if (!clickedButton) return;
+
+    const projectTitle = clickedButton.getAttribute("data-title");
+    modalTitle.textContent = projectTitle;
+    projectModal.style.display = "flex";
+  });
+}
+
+if (closeModalBtn) {
+  closeModalBtn.addEventListener("click", function () {
+    projectModal.style.display = "none";
+  });
+}
+
+projectModal.addEventListener("click", function (e) {
+  if (e.target === projectModal) {
+    projectModal.style.display = "none";
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    projectModal.style.display = "none";
+  }
+});
