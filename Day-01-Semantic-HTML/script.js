@@ -107,7 +107,7 @@ function renderProjects(dataArray) {
       project.status === "Active" ? "status-active" : "status-completed";
 
     const cardHTML = `
-            <div class="initiative-card ${statusClass}">
+            <div class="initiative-card ${statusClass} hidden">
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
                 <span class="badge">${project.status}</span>
@@ -120,16 +120,37 @@ function renderProjects(dataArray) {
 
 renderProjects(projectsData);
 
+/* ========================================== */
+/* DAY 21: PERFORMANCE DEBOUNCING             */
+/* ========================================== */
+
+function debounce(func, delay = 300) {
+  let timeoutId;
+
+  return function (...args) {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+function executeHeavySearch(event) {
+  const searchTerm = event.target.value.toLowerCase();
+
+  console.log(`📡 Fetching results for: "${searchTerm}"...`);
+
+  const filteredProjects = projectsData.filter((project) =>
+    project.title.toLowerCase().includes(searchTerm),
+  );
+
+  renderProjects(filteredProjects);
+}
+
 if (searchInput) {
-  searchInput.addEventListener("input", function () {
-    const searchTerm = searchInput.value.toLowerCase();
-
-    const filteredProjects = projectsData.filter((project) =>
-      project.title.toLowerCase().includes(searchTerm),
-    );
-
-    renderProjects(filteredProjects);
-  });
+  const optimizedSearch = debounce(executeHeavySearch, 400);
+  searchInput.addEventListener("input", optimizedSearch);
 }
 /* ========================================== */
 /* DAY 17: THEME TOGGLE & STATE PERSISTENCE   */
@@ -244,3 +265,95 @@ document.addEventListener("keydown", function (e) {
     projectModal.style.display = "none";
   }
 });
+/* ========================================== */
+/* DAY 20: STATEFUL UI ARCHITECTURE           */
+/* ========================================== */
+
+let taskState = [];
+
+const taskInput = document.getElementById("task-input");
+const addTaskBtn = document.getElementById("add-task-btn");
+const taskListContainer = document.getElementById("task-list");
+
+function renderTasks() {
+  if (!taskListContainer) return;
+
+  taskListContainer.innerHTML = "";
+
+  taskState.forEach((task) => {
+    const li = document.createElement("li");
+    li.className = `task-item ${task.completed ? "done" : ""}`;
+
+    li.innerHTML = `
+            <input type="checkbox" class="toggle-check" data-id="${task.id}" ${task.completed ? "checked" : ""}>
+            <span>${task.text}</span>
+            <button class="delete-btn" data-id="${task.id}">&times;</button>
+        `;
+
+    taskListContainer.appendChild(li);
+  });
+}
+
+if (addTaskBtn && taskInput) {
+  addTaskBtn.addEventListener("click", () => {
+    const textValue = taskInput.value.trim();
+    if (textValue === "") return;
+
+    const newTask = {
+      id: Date.now(),
+      text: textValue,
+      completed: false,
+    };
+
+    taskState.push(newTask);
+
+    taskInput.value = "";
+    renderTasks();
+  });
+}
+
+if (taskListContainer) {
+  taskListContainer.addEventListener("click", (e) => {
+    const targetId = Number(e.target.getAttribute("data-id"));
+    if (!targetId) return;
+
+    if (e.target.classList.contains("delete-btn")) {
+      taskState = taskState.filter((task) => task.id !== targetId);
+    }
+
+    if (e.target.classList.contains("toggle-check")) {
+      const foundTask = taskState.find((task) => task.id === targetId);
+      if (foundTask) {
+        foundTask.completed = !foundTask.completed;
+      }
+    }
+
+    renderTasks();
+  });
+}
+/* ========================================== */
+/* DAY 22: INTERSECTION OBSERVER API          */
+/* ========================================== */
+
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+      scrollObserver.unobserve(entry.target);
+    }
+  });
+});
+
+const hiddenElements = document.querySelectorAll(".hidden");
+
+hiddenElements.forEach((element) => {
+  scrollObserver.observe(element);
+});
+function observeHiddenElements() {
+  const hiddenElements = document.querySelectorAll(".hidden:not(.show)");
+  hiddenElements.forEach((element) => {
+    scrollObserver.observe(element);
+  });
+}
+
+observeHiddenElements();
