@@ -1,73 +1,111 @@
 /* ========================================== */
-/* DAY 12: MOBILE MENU TOGGLE LOGIC           */
+/* SYNEXUS CORE ENGINE — app.js               */
+/* Day 25: Unified Application Architecture   */
 /* ========================================== */
 
-const menuToggle = document.querySelector(".menu-toggle");
-const navLinksContainer = document.querySelector("nav ul");
+// ==========================================
+// 1. GLOBAL UI MODULES (Run once on load)
+// ==========================================
 
-if (menuToggle && navLinksContainer) {
+function initThemeToggle() {
+  const themeToggleBtn = document.getElementById("theme-toggle");
+  if (!themeToggleBtn) return;
+
+  const currentTheme = localStorage.getItem("synexus_theme");
+  if (currentTheme === "dark") {
+    document.body.classList.add("dark-theme");
+    themeToggleBtn.textContent = "☀️";
+  }
+
+  themeToggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-theme");
+    const isDark = document.body.classList.contains("dark-theme");
+    themeToggleBtn.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("synexus_theme", isDark ? "dark" : "light");
+  });
+}
+
+function initMobileMenu() {
+  const menuToggle = document.querySelector(".menu-toggle");
+  const navLinks = document.querySelector("nav ul");
+  if (!menuToggle || !navLinks) return;
+
   menuToggle.addEventListener("click", () => {
-    navLinksContainer.classList.toggle("nav-active");
-
+    navLinks.classList.toggle("nav-active");
     const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
     menuToggle.setAttribute("aria-expanded", !isExpanded);
   });
 }
-/* ========================================== */
-/* DAY 13: FORM VALIDATION LOGIC              */
-/* ========================================== */
 
-const membershipForm = document.querySelector(".membership-form");
-const nameInput = document.getElementById("fullName");
-const emailInput = document.getElementById("emailAddress");
+// ==========================================
+// 2. VIEW-SPECIFIC MODULES (Run when routed to "/")
+// ==========================================
 
-// Day 16: Restore saved draft on page load
-const savedDraft = localStorage.getItem("synexus_form_draft");
+// --- Day 13 + 16: Form Validation + Draft Persistence ---
+function initFormValidation() {
+  const membershipForm = document.querySelector(".membership-form");
+  const nameInput = document.getElementById("fullName");
+  const emailInput = document.getElementById("emailAddress");
+  if (!membershipForm || !nameInput || !emailInput) return;
 
-if (savedDraft) {
-  const parsedData = JSON.parse(savedDraft);
-  nameInput.value = parsedData.name;
-  emailInput.value = parsedData.email;
-}
+  const savedDraft = localStorage.getItem("synexus_form_draft");
+  if (savedDraft) {
+    const parsed = JSON.parse(savedDraft);
+    nameInput.value = parsed.name || "";
+    emailInput.value = parsed.email || "";
+  }
 
-function saveProgress() {
-  const draftData = {
-    name: nameInput.value,
-    email: emailInput.value,
-  };
-  localStorage.setItem("synexus_form_draft", JSON.stringify(draftData));
-}
+  function saveProgress() {
+    localStorage.setItem(
+      "synexus_form_draft",
+      JSON.stringify({
+        name: nameInput.value,
+        email: emailInput.value,
+      }),
+    );
+  }
+  nameInput.addEventListener("input", saveProgress);
+  emailInput.addEventListener("input", saveProgress);
 
-nameInput.addEventListener("input", saveProgress);
-emailInput.addEventListener("input", saveProgress);
-if (membershipForm) {
   membershipForm.addEventListener("submit", function (e) {
     e.preventDefault();
-
     const nameValue = nameInput.value.trim();
     const emailValue = emailInput.value.trim();
 
     if (nameValue === "") {
-      console.log("Error: Name cannot be blank.");
       nameInput.style.borderColor = "red";
     } else if (!emailValue.includes("@")) {
-      console.log("Error: Please enter a valid email address.");
       emailInput.style.borderColor = "red";
     } else {
-      console.log("Success! Application Data:", { nameValue, emailValue });
-
       nameInput.style.borderColor = "#ccc";
       emailInput.style.borderColor = "#ccc";
-
       membershipForm.reset();
-      localStorage.removeItem("synexus_form_draft"); // Day 16: clear saved draft
+      localStorage.removeItem("synexus_form_draft");
     }
   });
 }
-/* ========================================== */
-/* DAY 15: ARRAY FILTERING & SEARCH           */
-/* ========================================== */
 
+// --- Day 22: Scroll Observer ---
+let scrollObserver = null;
+function initScrollObserver() {
+  const hiddenElements = document.querySelectorAll(".hidden:not(.show)");
+  if (hiddenElements.length === 0) return;
+
+  if (!scrollObserver) {
+    scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          scrollObserver.unobserve(entry.target);
+        }
+      });
+    });
+  }
+
+  hiddenElements.forEach((el) => scrollObserver.observe(el));
+}
+
+// --- Day 15 + 21: Initiatives Search + Debounce ---
 const projectsData = [
   {
     title: "Project StoreLane",
@@ -89,424 +127,254 @@ const projectsData = [
   },
 ];
 
-const gridContainer = document.getElementById("dynamic-grid");
-const searchInput = document.getElementById("search-projects");
-
 function renderProjects(dataArray) {
+  const gridContainer = document.getElementById("dynamic-grid");
   if (!gridContainer) return;
 
   gridContainer.innerHTML = "";
-
   if (dataArray.length === 0) {
     gridContainer.innerHTML = "<p>No initiatives match your search.</p>";
     return;
   }
 
-  dataArray.forEach(function (project) {
+  dataArray.forEach((project) => {
     const statusClass =
       project.status === "Active" ? "status-active" : "status-completed";
-
-    const cardHTML = `
+    gridContainer.innerHTML += `
             <div class="initiative-card ${statusClass} hidden">
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
                 <span class="badge">${project.status}</span>
-<button class="view-btn" data-title="${project.title}">View Details</button>
+                <button class="view-btn" data-title="${project.title}">View Details</button>
             </div>
         `;
-    gridContainer.innerHTML += cardHTML;
   });
 }
-
-renderProjects(projectsData);
-
-/* ========================================== */
-/* DAY 21: PERFORMANCE DEBOUNCING             */
-/* ========================================== */
 
 function debounce(func, delay = 300) {
   let timeoutId;
-
   return function (...args) {
     clearTimeout(timeoutId);
-
-    timeoutId = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
 }
 
-function executeHeavySearch(event) {
-  const searchTerm = event.target.value.toLowerCase();
+function initInitiativesSearch() {
+  const gridContainer = document.getElementById("dynamic-grid");
+  const searchInput = document.getElementById("search-projects");
+  if (!gridContainer) return;
 
-  console.log(`📡 Fetching results for: "${searchTerm}"...`);
+  renderProjects(projectsData);
+  initScrollObserver();
 
-  const filteredProjects = projectsData.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm),
-  );
-
-  renderProjects(filteredProjects);
-  observeHiddenElements(); // re-attach observer to freshly rendered cards
-}
-
-if (searchInput) {
-  const optimizedSearch = debounce(executeHeavySearch, 400);
-  searchInput.addEventListener("input", optimizedSearch);
-}
-/* ========================================== */
-/* DAY 17: THEME TOGGLE & STATE PERSISTENCE   */
-/* ========================================== */
-
-const themeToggleBtn = document.getElementById("theme-toggle");
-
-const currentTheme = localStorage.getItem("synexus_theme");
-
-if (currentTheme === "dark") {
-  document.body.classList.add("dark-theme");
-  themeToggleBtn.textContent = "☀️";
-}
-
-if (themeToggleBtn) {
-  themeToggleBtn.addEventListener("click", function () {
-    document.body.classList.toggle("dark-theme");
-
-    let theme = "light";
-    if (document.body.classList.contains("dark-theme")) {
-      theme = "dark";
-      themeToggleBtn.textContent = "☀️";
-    } else {
-      themeToggleBtn.textContent = "🌙";
-    }
-
-    localStorage.setItem("synexus_theme", theme);
-  });
-}
-/* ========================================== */
-/* DAY 18: TIMERS & THE EVENT LOOP            */
-/* ========================================== */
-
-const testimonialsData = [
-  {
-    name: "Anant Sharma",
-    quote: "It's about logic, not just languages.",
-  },
-  {
-    name: "Harshit Singh",
-    quote:
-      "Synexus changed how I approach engineering. It's about logic, not just languages.",
-  },
-  {
-    name: "P V Pavithra",
-    quote:
-      "Building real-world architecture in this community has been a game changer.",
-  },
-  {
-    name: "Abhay Aditya R S",
-    quote:
-      "The focus on standard protocols over fleeting trends is exactly what the industry needs.",
-  },
-];
-
-const testimonialName = document.getElementById("testimonial-name");
-const testimonialQuote = document.getElementById("testimonial-quote");
-
-let currentIndex = 0;
-
-function updateTestimonial() {
-  if (!testimonialName || !testimonialQuote) return;
-
-  const currentData = testimonialsData[currentIndex];
-
-  testimonialName.textContent = currentData.name;
-  testimonialQuote.textContent = currentData.quote;
-
-  currentIndex++;
-
-  if (currentIndex >= testimonialsData.length) {
-    currentIndex = 0;
+  if (searchInput) {
+    const optimizedSearch = debounce((event) => {
+      const term = event.target.value.toLowerCase();
+      const filtered = projectsData.filter((p) =>
+        p.title.toLowerCase().includes(term),
+      );
+      renderProjects(filtered);
+      initScrollObserver();
+    }, 400);
+    searchInput.addEventListener("input", optimizedSearch);
   }
 }
 
-updateTestimonial();
+// --- Day 19: Modal ---
+function initProjectModal() {
+  const gridContainer = document.getElementById("dynamic-grid");
+  const projectModal = document.getElementById("project-modal");
+  const modalTitle = document.getElementById("modal-title");
+  const closeModalBtn = document.getElementById("close-modal");
+  if (!gridContainer || !projectModal) return;
 
-const carouselTimer = setInterval(updateTestimonial, 3000);
-/* ========================================== */
-/* DAY 19: EVENT DELEGATION & MODALS          */
-/* ========================================== */
-
-const projectModal = document.getElementById("project-modal");
-const modalTitle = document.getElementById("modal-title");
-const closeModalBtn = document.getElementById("close-modal");
-
-if (gridContainer) {
-  gridContainer.addEventListener("click", function (e) {
+  gridContainer.addEventListener("click", (e) => {
     const clickedButton = e.target.closest(".view-btn");
     if (!clickedButton) return;
-
-    const projectTitle = clickedButton.getAttribute("data-title");
-    modalTitle.textContent = projectTitle;
+    modalTitle.textContent = clickedButton.getAttribute("data-title");
     projectModal.style.display = "flex";
   });
-}
 
-if (closeModalBtn) {
-  closeModalBtn.addEventListener("click", function () {
-    projectModal.style.display = "none";
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      projectModal.style.display = "none";
+    });
+  }
+  projectModal.addEventListener("click", (e) => {
+    if (e.target === projectModal) projectModal.style.display = "none";
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") projectModal.style.display = "none";
   });
 }
 
-projectModal.addEventListener("click", function (e) {
-  if (e.target === projectModal) {
-    projectModal.style.display = "none";
+// --- Day 18: Testimonials Carousel (interval-safe) ---
+let testimonialInterval = null;
+function initTestimonials() {
+  const testimonialName = document.getElementById("testimonial-name");
+  const testimonialQuote = document.getElementById("testimonial-quote");
+  if (!testimonialName || !testimonialQuote) return;
+
+  const testimonialsData = [
+    { name: "Anant Sharma", quote: "It's about logic, not just languages." },
+    {
+      name: "Harshit Singh",
+      quote:
+        "Synexus changed how I approach engineering. It's about logic, not just languages.",
+    },
+    {
+      name: "P V Pavithra",
+      quote:
+        "Building real-world architecture in this community has been a game changer.",
+    },
+    {
+      name: "Abhay Aditya R S",
+      quote:
+        "The focus on standard protocols over fleeting trends is exactly what the industry needs.",
+    },
+  ];
+
+  let currentIndex = 0;
+  function updateTestimonial() {
+    const data = testimonialsData[currentIndex];
+    testimonialName.textContent = data.name;
+    testimonialQuote.textContent = data.quote;
+    currentIndex = (currentIndex + 1) % testimonialsData.length;
   }
-});
 
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    projectModal.style.display = "none";
-  }
-});
-/* ========================================== */
-/* DAY 20: STATEFUL UI ARCHITECTURE           */
-/* ========================================== */
+  updateTestimonial();
 
-let taskState = [];
-
-const taskInput = document.getElementById("task-input");
-const addTaskBtn = document.getElementById("add-task-btn");
-const taskListContainer = document.getElementById("task-list");
-
-function renderTasks() {
-  if (!taskListContainer) return;
-
-  taskListContainer.innerHTML = "";
-
-  taskState.forEach((task) => {
-    const li = document.createElement("li");
-    li.className = `task-item ${task.completed ? "done" : ""}`;
-
-    li.innerHTML = `
-            <input type="checkbox" class="toggle-check" data-id="${task.id}" ${task.completed ? "checked" : ""}>
-            <span>${task.text}</span>
-            <button class="delete-btn" data-id="${task.id}">&times;</button>
-        `;
-
-    taskListContainer.appendChild(li);
-  });
+  if (testimonialInterval) clearInterval(testimonialInterval); // prevent stacked carousels
+  testimonialInterval = setInterval(updateTestimonial, 3000);
 }
 
-if (addTaskBtn && taskInput) {
+// --- Day 20: Task Tracker ---
+function initTaskTracker() {
+  const taskInput = document.getElementById("task-input");
+  const addTaskBtn = document.getElementById("add-task-btn");
+  const taskListContainer = document.getElementById("task-list");
+  if (!taskListContainer || !addTaskBtn || !taskInput) return;
+
+  let taskState = [];
+
+  function renderTasks() {
+    taskListContainer.innerHTML = "";
+    taskState.forEach((task) => {
+      const li = document.createElement("li");
+      li.className = `task-item ${task.completed ? "done" : ""}`;
+      li.innerHTML = `
+                <input type="checkbox" class="toggle-check" data-id="${task.id}" ${task.completed ? "checked" : ""}>
+                <span>${task.text}</span>
+                <button class="delete-btn" data-id="${task.id}">&times;</button>
+            `;
+      taskListContainer.appendChild(li);
+    });
+  }
+
   addTaskBtn.addEventListener("click", () => {
     const textValue = taskInput.value.trim();
     if (textValue === "") return;
-
-    const newTask = {
-      id: Date.now(),
-      text: textValue,
-      completed: false,
-    };
-
-    taskState.push(newTask);
-
+    taskState.push({ id: Date.now(), text: textValue, completed: false });
     taskInput.value = "";
     renderTasks();
   });
-}
 
-if (taskListContainer) {
   taskListContainer.addEventListener("click", (e) => {
     const targetId = Number(e.target.getAttribute("data-id"));
     if (!targetId) return;
-
     if (e.target.classList.contains("delete-btn")) {
-      taskState = taskState.filter((task) => task.id !== targetId);
+      taskState = taskState.filter((t) => t.id !== targetId);
     }
-
     if (e.target.classList.contains("toggle-check")) {
-      const foundTask = taskState.find((task) => task.id === targetId);
-      if (foundTask) {
-        foundTask.completed = !foundTask.completed;
-      }
+      const found = taskState.find((t) => t.id === targetId);
+      if (found) found.completed = !found.completed;
     }
-
     renderTasks();
   });
 }
-/* ========================================== */
-/* DAY 22: INTERSECTION OBSERVER API          */
-/* ========================================== */
 
-const scrollObserver = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("show");
-      scrollObserver.unobserve(entry.target);
-    }
+// --- Day 23 + Bonus: Kanban Board with LocalStorage persistence ---
+function saveKanbanState() {
+  const columns = document.querySelectorAll(".kanban-column");
+  const state = {};
+  columns.forEach((col) => {
+    const status = col.dataset.status;
+    const cards = col.querySelectorAll(".task-card");
+    state[status] = Array.from(cards).map((c) => c.textContent);
   });
-});
+  localStorage.setItem("synexus_kanban_state", JSON.stringify(state));
+}
 
-const hiddenElements = document.querySelectorAll(".hidden");
+function loadKanbanState() {
+  const saved = localStorage.getItem("synexus_kanban_state");
+  if (!saved) return;
 
-hiddenElements.forEach((element) => {
-  scrollObserver.observe(element);
-});
-function observeHiddenElements() {
-  const hiddenElements = document.querySelectorAll(".hidden:not(.show)");
-  hiddenElements.forEach((element) => {
-    scrollObserver.observe(element);
+  const state = JSON.parse(saved);
+  Object.keys(state).forEach((status) => {
+    const column = document.querySelector(
+      `.kanban-column[data-status="${status}"] .task-list`,
+    );
+    if (!column) return;
+    column.innerHTML = "";
+    state[status].forEach((text) => {
+      const card = document.createElement("div");
+      card.className = "task-card";
+      card.setAttribute("draggable", "true");
+      card.textContent = text;
+      column.appendChild(card);
+    });
   });
 }
 
-observeHiddenElements();
-/* ========================================== */
-/* DAY 23: DRAG AND DROP API                  */
-/* ========================================== */
+function initKanbanBoard() {
+  const kanbanColumns = document.querySelectorAll(".kanban-column .task-list");
+  if (kanbanColumns.length === 0) return;
 
-const taskCards = document.querySelectorAll(".task-card");
-const kanbanColumns = document.querySelectorAll(".kanban-column .task-list");
+  loadKanbanState();
 
-taskCards.forEach((card) => {
-  card.addEventListener("dragstart", () => {
-    card.classList.add("is-dragging");
-  });
-
-  card.addEventListener("dragend", () => {
-    card.classList.remove("is-dragging");
-  });
-});
-
-kanbanColumns.forEach((column) => {
-  column.addEventListener("dragover", (e) => {
-    e.preventDefault();
-
-    const draggedCard = document.querySelector(".is-dragging");
-    if (draggedCard) {
-      column.appendChild(draggedCard);
-    }
-  });
-});
-/* ========================================== */
-/* DAY 24: SPA CLIENT-SIDE ROUTING            */
-/* ========================================== */
-
-const appRoot = document.getElementById("app-root");
-const homeHTML = appRoot.innerHTML; // save your full existing page as the "/" route
-
-const routes = {
-  "/": homeHTML,
-  "/initiatives": `
-    <div class="view-container" style="padding:60px 50px;text-align:center;">
-      <h2>Community Initiatives</h2>
-      <p>Our project gallery will render here.</p>
-      <a href="/" class="nav-link">← Back Home</a>
-    </div>
-  `,
-  "/team": `
-    <div class="view-container" style="padding:60px 50px;text-align:center;">
-      <h2>Leadership Team</h2>
-      <p>Core committee profiles will render here.</p>
-      <a href="/" class="nav-link">← Back Home</a>
-    </div>
-  `,
-  404: `
-    <div class="view-container" style="padding:60px 50px;text-align:center;">
-      <h1>404</h1>
-      <p>Page not found.</p>
-      <a href="/" class="nav-link">Go Home</a>
-    </div>
-  `,
-};
-
-function router() {
-  let path = window.location.pathname;
-  if (path.includes("index.html")) path = "/";
-
-  const viewHTML = routes[path] || routes[404];
-  appRoot.innerHTML = viewHTML;
-
-  // Re-init anything that depends on elements inside #app-root,
-  // ONLY needed when path === "/" since that's the only route with those elements
-  if (path === "/") {
-    renderProjects(projectsData); // Day 15
-    renderTasks(); // Day 20
-    updateTestimonial(); // Day 18
-    observeHiddenElements(); // Day 22
-  }
-}
-
-document.body.addEventListener("click", (e) => {
-  if (e.target.matches(".nav-link")) {
-    e.preventDefault();
-    const newUrl = e.target.getAttribute("href");
-    window.history.pushState(null, "", newUrl);
-    router();
-  }
-});
-
-window.addEventListener("popstate", router);
-router(); // initial render
-/* ========================================== */
-/* DAY 25: PHASE 2 CAPSTONE ENGINE            */
-/* ========================================== */
-
-// ==========================================
-// 1. GLOBAL UI MODULES (Run once on load)
-// ==========================================
-
-function initThemeToggle() {
-  const themeToggleBtn = document.getElementById("theme-toggle");
-  if (!themeToggleBtn) return; // Safety check
-
-  const currentTheme = localStorage.getItem("synexus_theme");
-  if (currentTheme === "dark") document.body.classList.add("dark-theme");
-
-  // Make sure we only attach this once!
-  themeToggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("dark-theme");
-    const theme = document.body.classList.contains("dark-theme")
-      ? "dark"
-      : "light";
-    localStorage.setItem("synexus_theme", theme);
-  });
-}
-
-function initMobileMenu() {
-  const menuToggle = document.querySelector(".menu-toggle");
-  const navLinks = document.querySelector("nav ul");
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () =>
-      navLinks.classList.toggle("nav-active"),
+  function attachCardListeners(card) {
+    card.addEventListener("dragstart", () => card.classList.add("is-dragging"));
+    card.addEventListener("dragend", () =>
+      card.classList.remove("is-dragging"),
     );
   }
+
+  document.querySelectorAll(".task-card").forEach(attachCardListeners);
+
+  kanbanColumns.forEach((column) => {
+    column.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      const draggedCard = document.querySelector(".is-dragging");
+      if (draggedCard) column.appendChild(draggedCard);
+    });
+
+    column.addEventListener("drop", () => {
+      saveKanbanState();
+    });
+  });
 }
 
 // ==========================================
-// 2. VIEW-SPECIFIC MODULES (Run when routed)
+// 3. THE SPA ROUTER
 // ==========================================
 
-function initFormValidation() {
-  const membershipForm = document.querySelector(".membership-form");
-  if (!membershipForm) return;
+let routes = {};
 
-  // Paste your Day 13 Validation & Day 16 LocalStorage code here
-  // ...
+function buildRoutes() {
+  const appRoot = document.getElementById("app-root");
+  const homeHTML = appRoot.innerHTML;
+
+  routes = {
+    "/": homeHTML,
+    404: `
+            <div class="view-container" style="padding:60px 50px;text-align:center;">
+                <h1>404</h1>
+                <p>Page not found.</p>
+                <a href="/">Go Home</a>
+            </div>
+        `,
+  };
 }
-
-function initScrollObserver() {
-  const hiddenElements = document.querySelectorAll(".hidden");
-  if (hiddenElements.length === 0) return;
-
-  // Paste your Day 22 Intersection Observer code here
-  // ...
-}
-
-// ==========================================
-// 3. THE SPA ROUTER (The Orchestrator)
-// ==========================================
-
-const routes = {
-  // Paste your routes from Day 24 here
-};
 
 function router() {
   let path = window.location.pathname;
@@ -515,13 +383,13 @@ function router() {
   const viewHTML = routes[path] || routes[404];
   document.getElementById("app-root").innerHTML = viewHTML;
 
-  // ⚡ THE CRITICAL STEP: Re-initialize local logic after injecting new HTML!
   if (path === "/") {
-    initScrollObserver();
-  } else if (path === "/join") {
+    initInitiativesSearch();
+    initProjectModal();
+    initTestimonials();
+    initTaskTracker();
+    initKanbanBoard();
     initFormValidation();
-  } else if (path === "/team") {
-    // initKanbanBoard();
   }
 }
 
@@ -532,24 +400,22 @@ function router() {
 function initApp() {
   console.log("Synexus Core Engine: Online.");
 
-  // 1. Start global features
+  buildRoutes();
+
   initThemeToggle();
   initMobileMenu();
 
-  // 2. Intercept navigation for the SPA
   document.body.addEventListener("click", (e) => {
     if (e.target.matches(".nav-link")) {
       e.preventDefault();
-      window.history.pushState(null, "", e.target.href);
+      window.history.pushState(null, "", e.target.getAttribute("href"));
       router();
     }
   });
 
   window.addEventListener("popstate", router);
 
-  // 3. Render the initial view
   router();
 }
 
-// ⏳ Wait for the browser to build the HTML before starting the engine
 document.addEventListener("DOMContentLoaded", initApp);
