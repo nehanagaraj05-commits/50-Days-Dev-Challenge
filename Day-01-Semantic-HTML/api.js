@@ -1,18 +1,49 @@
 /* ========================================== */
-/* api.js: All Network Requests                */
+/* api.js: All Network Requests + Caching     */
 /* ========================================== */
 
+// 1. THE MEMORY BANK — lives only inside this module, invisible to main.js
+const userCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function fetchGithubUser(username, signal) {
-  const response = await fetch(`https://api.github.com/users/${username}`, {
+  const safeUsername = username.toLowerCase();
+
+  // 2. THE CACHE INTERCEPT (with TTL check)
+  if (userCache.has(safeUsername)) {
+    const cached = userCache.get(safeUsername);
+    const isExpired = Date.now() - cached.timestamp > CACHE_TTL_MS;
+
+    if (!isExpired) {
+      console.log(`⚡ Serving [${safeUsername}] from local cache!`);
+      return cached.data;
+    } else {
+      console.log(`⏳ Cache expired for [${safeUsername}], refetching...`);
+      userCache.delete(safeUsername);
+    }
+  }
+
+  console.log(`📡 Fetching [${safeUsername}] from external server...`);
+
+  const response = await fetch(`https://api.github.com/users/${safeUsername}`, {
     signal,
   });
+
   if (response.status === 403 || response.status === 429) {
     throw new Error(
       "API Rate Limit exceeded! You searched too many times. Take a breath.",
     );
   }
-  if (!response.ok) throw new Error("Developer not found.");
-  return await response.json();
+  if (!response.ok) {
+    throw new Error("Developer not found.");
+  }
+
+  const data = await response.json();
+
+  // 3. SAVE TO MEMORY — only on success, never cache a failed/thrown response
+  userCache.set(safeUsername, { data, timestamp: Date.now() });
+
+  return data;
 }
 
 export async function fetchGithubRepos(username, signal) {
