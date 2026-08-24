@@ -9,17 +9,6 @@ export function debounce(func, delay = 500) {
     timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
 }
-/* ========================================== */
-/* utils.js: Helper Functions                 */
-/* ========================================== */
-
-export function debounce(func, delay = 500) {
-  let timeoutId;
-  return function (...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-}
 
 export async function fetchWithRetry(
   url,
@@ -35,7 +24,6 @@ export async function fetchWithRetry(
     try {
       const response = await fetch(url, options);
 
-      // Client errors (400-499) won't fix themselves on retry — return immediately
       if (response.status >= 400 && response.status < 500) {
         return response;
       }
