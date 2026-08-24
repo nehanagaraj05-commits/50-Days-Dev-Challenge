@@ -1,10 +1,19 @@
 /* ========================================== */
-/* SYNEXUS CORE ENGINE — app.js               */
-/* Day 25: Unified Application Architecture   */
+/* main.js: Synexus Core Engine (Modular)     */
 /* ========================================== */
 
+import { debounce } from "./utils.js";
+import {
+  fetchGithubUser,
+  fetchGithubRepos,
+  postProposal,
+  updateProposal,
+  deleteProposal,
+  fetchPostsPage,
+} from "./api.js";
+
 // ==========================================
-// 1. GLOBAL UI MODULES (Run once on load)
+// 1. GLOBAL UI MODULES
 // ==========================================
 
 function initThemeToggle() {
@@ -38,10 +47,9 @@ function initMobileMenu() {
 }
 
 // ==========================================
-// 2. VIEW-SPECIFIC MODULES (Run when routed to "/")
+// 2. VIEW-SPECIFIC MODULES
 // ==========================================
 
-// --- Day 13 + 16: Form Validation + Draft Persistence ---
 function initFormValidation() {
   const membershipForm = document.querySelector(".membership-form");
   const nameInput = document.getElementById("fullName");
@@ -85,7 +93,6 @@ function initFormValidation() {
   });
 }
 
-// --- Day 22: Scroll Observer ---
 let scrollObserver = null;
 function initScrollObserver() {
   const hiddenElements = document.querySelectorAll(".hidden:not(.show)");
@@ -101,11 +108,9 @@ function initScrollObserver() {
       });
     });
   }
-
   hiddenElements.forEach((el) => scrollObserver.observe(el));
 }
 
-// --- Day 15 + 21: Initiatives Search + Debounce ---
 const projectsData = [
   {
     title: "Project StoreLane",
@@ -151,14 +156,6 @@ function renderProjects(dataArray) {
   });
 }
 
-function debounce(func, delay = 300) {
-  let timeoutId;
-  return function (...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-}
-
 function initInitiativesSearch() {
   const gridContainer = document.getElementById("dynamic-grid");
   const searchInput = document.getElementById("search-projects");
@@ -180,7 +177,6 @@ function initInitiativesSearch() {
   }
 }
 
-// --- Day 19: Modal ---
 function initProjectModal() {
   const gridContainer = document.getElementById("dynamic-grid");
   const projectModal = document.getElementById("project-modal");
@@ -208,7 +204,6 @@ function initProjectModal() {
   });
 }
 
-// --- Day 18: Testimonials Carousel (interval-safe) ---
 let testimonialInterval = null;
 function initTestimonials() {
   const testimonialName = document.getElementById("testimonial-name");
@@ -243,12 +238,10 @@ function initTestimonials() {
   }
 
   updateTestimonial();
-
-  if (testimonialInterval) clearInterval(testimonialInterval); // prevent stacked carousels
+  if (testimonialInterval) clearInterval(testimonialInterval);
   testimonialInterval = setInterval(updateTestimonial, 3000);
 }
 
-// --- Day 20: Task Tracker ---
 function initTaskTracker() {
   const taskInput = document.getElementById("task-input");
   const addTaskBtn = document.getElementById("add-task-btn");
@@ -293,7 +286,6 @@ function initTaskTracker() {
   });
 }
 
-// --- Day 23 + Bonus: Kanban Board with LocalStorage persistence ---
 function saveKanbanState() {
   const columns = document.querySelectorAll(".kanban-column");
   const state = {};
@@ -338,7 +330,6 @@ function initKanbanBoard() {
       card.classList.remove("is-dragging"),
     );
   }
-
   document.querySelectorAll(".task-card").forEach(attachCardListeners);
 
   kanbanColumns.forEach((column) => {
@@ -347,11 +338,221 @@ function initKanbanBoard() {
       const draggedCard = document.querySelector(".is-dragging");
       if (draggedCard) column.appendChild(draggedCard);
     });
-
-    column.addEventListener("drop", () => {
-      saveKanbanState();
-    });
+    column.addEventListener("drop", () => saveKanbanState());
   });
+}
+
+// --- Day 26+27+28: Dev Lookup (now using api.js) ---
+function initDevLookup() {
+  const usernameInput = document.getElementById("github-username");
+  const profileContainer = document.getElementById("dev-profile-card");
+  const reposGrid = document.getElementById("repos-grid");
+  if (!usernameInput || !profileContainer || !reposGrid) return;
+
+  let currentController = null;
+
+  async function loadRepos(username, signal) {
+    reposGrid.innerHTML = `<p class="loading-text">Loading repositories...</p>`;
+    try {
+      const data = await fetchGithubRepos(username, signal);
+      reposGrid.innerHTML = "";
+
+      if (data.length === 0) {
+        reposGrid.innerHTML = `<p>No public repositories found for this user.</p>`;
+        return;
+      }
+
+      data.forEach((repo) => {
+        reposGrid.innerHTML += `
+                    <div class="initiative-card">
+                        <h3>${repo.name}</h3>
+                        <p>${repo.description || "No description provided for this project."}</p>
+                        <div class="repo-meta" style="margin-top: 15px; display: flex; gap: 10px; font-size: 0.9rem;">
+                            <span>⭐ ${repo.stargazers_count}</span>
+                            <span>🍴 ${repo.forks_count}</span>
+                        </div>
+                        <a href="${repo.html_url}" target="_blank" class="btn-cta" style="margin-top: 15px; display: inline-block;">View Code</a>
+                    </div>
+                `;
+      });
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      reposGrid.innerHTML = `<p class="error-text">⚠️ Failed to load repositories.</p>`;
+    }
+  }
+
+  async function loadContributor() {
+    const username = usernameInput.value.trim();
+
+    if (currentController) currentController.abort();
+    currentController = new AbortController();
+    const signal = currentController.signal;
+
+    if (username === "") {
+      profileContainer.innerHTML = "";
+      reposGrid.innerHTML = "";
+      return;
+    }
+
+    profileContainer.innerHTML = `<p class="loading-text">Searching for ${username}...</p>`;
+    reposGrid.innerHTML = "";
+
+    try {
+      const data = await fetchGithubUser(username, signal);
+      profileContainer.innerHTML = `
+                <div class="profile-card">
+                    <img src="${data.avatar_url}" alt="${data.name || data.login}'s Avatar">
+                    <h3>${data.name || data.login}</h3>
+                    <p>${data.bio || "No bio available."}</p>
+                    <a href="${data.html_url}" target="_blank" class="btn-cta">View GitHub</a>
+                </div>
+            `;
+      loadRepos(username, signal);
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      profileContainer.innerHTML = `<p class="error-text">⚠️ ${error.message}</p>`;
+    }
+  }
+
+  const optimizedSearch = debounce(loadContributor, 500);
+  usernameInput.addEventListener("input", optimizedSearch);
+}
+
+// --- Day 29: Proposal Form (now using api.js) ---
+function initProposalForm() {
+  const proposalForm = document.getElementById("proposal-form");
+  const titleInput = document.getElementById("proposal-title");
+  const descInput = document.getElementById("proposal-description");
+  const submitBtn = document.getElementById("proposal-submit-btn");
+  const feedbackContainer = document.getElementById("proposal-feedback");
+  if (
+    !proposalForm ||
+    !titleInput ||
+    !descInput ||
+    !submitBtn ||
+    !feedbackContainer
+  )
+    return;
+
+  proposalForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const newInitiative = {
+      title: titleInput.value.trim(),
+      body: descInput.value.trim(),
+      userId: 1,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+    feedbackContainer.innerHTML = "";
+
+    try {
+      const data = await postProposal(newInitiative);
+      feedbackContainer.innerHTML = `<p class="success-text">✅ Proposal submitted! (ID: ${data.id})</p>`;
+      proposalForm.reset();
+    } catch (error) {
+      feedbackContainer.innerHTML = `<p class="error-text">⚠️ Failed to submit proposal. Please try again.</p>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Proposal";
+    }
+  });
+}
+
+// --- Day 30: PUT/DELETE (now using api.js) ---
+function initProposalManagement() {
+  const updateBtn = document.getElementById("update-btn");
+  const deleteBtn = document.getElementById("delete-btn");
+  const feedbackMessage = document.getElementById("manage-feedback");
+  if (!updateBtn || !deleteBtn || !feedbackMessage) return;
+
+  updateBtn.addEventListener("click", async () => {
+    try {
+      feedbackMessage.innerHTML = `<p class="loading-text">Updating initiative #1...</p>`;
+      const result = await updateProposal(1, {
+        id: 1,
+        title: "StoreLane V2 Architecture [UPDATED]",
+        body: "Revised specifications for the hyperlocal platform.",
+        userId: 1,
+      });
+      console.log("Update Confirmed:", result);
+      feedbackMessage.innerHTML = `<p style="color: blue;">🔄 Initiative #1 updated successfully!</p>`;
+    } catch (error) {
+      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
+    }
+  });
+
+  deleteBtn.addEventListener("click", async () => {
+    const isConfirmed = window.confirm(
+      "WARNING: Are you sure you want to delete this? This cannot be undone.",
+    );
+    if (!isConfirmed) return;
+
+    try {
+      feedbackMessage.innerHTML = `<p class="loading-text">Deleting initiative #1...</p>`;
+      await deleteProposal(1);
+      feedbackMessage.innerHTML = `<p style="color: red;">🗑️ Initiative #1 was permanently deleted.</p>`;
+    } catch (error) {
+      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
+    }
+  });
+}
+
+// --- Day 31: Infinite Scroll (now using api.js) ---
+function initInfiniteScrollFeed() {
+  const feedContainer = document.getElementById("data-feed");
+  const sentinel = document.getElementById("scroll-sentinel");
+  if (!feedContainer || !sentinel) return;
+
+  let currentPage = 1;
+  const limit = 10;
+  let isLoading = false;
+  let hasMoreData = true;
+
+  async function fetchNextPage() {
+    if (isLoading || !hasMoreData) return;
+    isLoading = true;
+
+    try {
+      const data = await fetchPostsPage(currentPage, limit);
+
+      if (data.length === 0) {
+        hasMoreData = false;
+        sentinel.textContent = "You've reached the end of the feed.";
+        feedScrollObserver.disconnect();
+        return;
+      }
+
+      data.forEach((item) => {
+        feedContainer.innerHTML += `
+                    <div class="feed-card">
+                        <h4>${item.id}. ${item.title}</h4>
+                        <p>${item.body}</p>
+                    </div>
+                `;
+      });
+    } catch (error) {
+      sentinel.textContent = "Error loading more items.";
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  const feedScrollObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          currentPage++;
+          fetchNextPage();
+        }
+      });
+    },
+    { rootMargin: "100px" },
+  );
+
+  fetchNextPage();
+  feedScrollObserver.observe(sentinel);
 }
 
 // ==========================================
@@ -402,7 +603,7 @@ function router() {
 // ==========================================
 
 function initApp() {
-  console.log("Synexus Core Engine: Online.");
+  console.log("Synexus Core Engine: Online (Modular).");
 
   buildRoutes();
 
@@ -423,307 +624,3 @@ function initApp() {
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
-// --- Day 26: Async GitHub Contributor Lookup ---
-// --- Day 26 + 27: Async GitHub Contributor + Repository Lookup ---
-// --- Day 26 + 27 + 28: Real-time Debounced GitHub Lookup with Rate-Limit + Abort handling ---
-function initDevLookup() {
-  const usernameInput = document.getElementById("github-username");
-  const profileContainer = document.getElementById("dev-profile-card");
-  const reposGrid = document.getElementById("repos-grid");
-  if (!usernameInput || !profileContainer || !reposGrid) return;
-
-  let currentController = null; // Bonus: tracks the in-flight request so we can cancel it
-
-  async function fetchRepositories(username, signal) {
-    reposGrid.innerHTML = `<p class="loading-text">Loading repositories...</p>`;
-
-    try {
-      const response = await fetch(
-        `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`,
-        { signal },
-      );
-
-      if (!response.ok) {
-        throw new Error("Could not fetch repositories.");
-      }
-
-      const data = await response.json();
-      reposGrid.innerHTML = "";
-
-      if (data.length === 0) {
-        reposGrid.innerHTML = `<p>No public repositories found for this user.</p>`;
-        return;
-      }
-
-      data.forEach((repo) => {
-        const repoCard = `
-                    <div class="initiative-card">
-                        <h3>${repo.name}</h3>
-                        <p>${repo.description || "No description provided for this project."}</p>
-                        <div class="repo-meta" style="margin-top: 15px; display: flex; gap: 10px; font-size: 0.9rem;">
-                            <span>⭐ ${repo.stargazers_count}</span>
-                            <span>🍴 ${repo.forks_count}</span>
-                        </div>
-                        <a href="${repo.html_url}" target="_blank" class="btn-cta" style="margin-top: 15px; display: inline-block;">View Code</a>
-                    </div>
-                `;
-        reposGrid.innerHTML += repoCard;
-      });
-    } catch (error) {
-      if (error.name === "AbortError") return; // silently ignore cancelled requests
-      console.error("Repo Fetch Error:", error);
-      reposGrid.innerHTML = `<p class="error-text">⚠️ Failed to load repositories.</p>`;
-    }
-  }
-
-  async function fetchContributor() {
-    const username = usernameInput.value.trim();
-
-    // Bonus: cancel any request still in flight before starting a new one
-    if (currentController) currentController.abort();
-    currentController = new AbortController();
-    const signal = currentController.signal;
-
-    if (username === "") {
-      profileContainer.innerHTML = "";
-      reposGrid.innerHTML = "";
-      return;
-    }
-
-    profileContainer.innerHTML = `<p class="loading-text">Searching for ${username}...</p>`;
-    reposGrid.innerHTML = "";
-
-    try {
-      const response = await fetch(`https://api.github.com/users/${username}`, {
-        signal,
-      });
-
-      if (response.status === 403 || response.status === 429) {
-        throw new Error(
-          "API Rate Limit exceeded! You searched too many times. Take a breath.",
-        );
-      }
-
-      if (!response.ok) {
-        throw new Error("Developer not found.");
-      }
-
-      const data = await response.json();
-
-      profileContainer.innerHTML = `
-                <div class="profile-card">
-                    <img src="${data.avatar_url}" alt="${data.name || data.login}'s Avatar">
-                    <h3>${data.name || data.login}</h3>
-                    <p>${data.bio || "No bio available."}</p>
-                    <a href="${data.html_url}" target="_blank" class="btn-cta">View GitHub</a>
-                </div>
-            `;
-
-      fetchRepositories(username, signal); // chained, and cancellable via the same signal
-    } catch (error) {
-      if (error.name === "AbortError") return; // request was cancelled by a newer keystroke, not a real error
-      console.error("API Error:", error);
-      profileContainer.innerHTML = `<p class="error-text">⚠️ ${error.message}</p>`;
-    }
-  }
-
-  const optimizedSearch = debounce(fetchContributor, 500);
-  usernameInput.addEventListener("input", optimizedSearch);
-}
-// --- Day 29: POST Requests - Propose an Initiative ---
-function initProposalForm() {
-  const proposalForm = document.getElementById("proposal-form");
-  const titleInput = document.getElementById("proposal-title");
-  const descInput = document.getElementById("proposal-description");
-  const submitBtn = document.getElementById("proposal-submit-btn");
-  const feedbackContainer = document.getElementById("proposal-feedback");
-  if (
-    !proposalForm ||
-    !titleInput ||
-    !descInput ||
-    !submitBtn ||
-    !feedbackContainer
-  )
-    return;
-
-  proposalForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const newInitiative = {
-      title: titleInput.value.trim(),
-      body: descInput.value.trim(),
-      userId: 1,
-    };
-
-    // Bonus: prevent duplicate submissions
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-    feedbackContainer.innerHTML = "";
-
-    try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts",
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          body: JSON.stringify(newInitiative),
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.status === 201) {
-        feedbackContainer.innerHTML = `<p class="success-text">✅ Proposal submitted! (ID: ${data.id})</p>`;
-        proposalForm.reset();
-      } else {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
-    } catch (error) {
-      console.error("Proposal Submission Error:", error);
-      feedbackContainer.innerHTML = `<p class="error-text">⚠️ Failed to submit proposal. Please try again.</p>`;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Proposal";
-    }
-  });
-}
-// --- Day 30: Full CRUD - PUT & DELETE Requests ---
-function initProposalManagement() {
-  const updateBtn = document.getElementById("update-btn");
-  const deleteBtn = document.getElementById("delete-btn");
-  const feedbackMessage = document.getElementById("manage-feedback");
-  if (!updateBtn || !deleteBtn || !feedbackMessage) return;
-
-  async function updateInitiative(targetId, updatedData) {
-    try {
-      feedbackMessage.innerHTML = `<p class="loading-text">Updating initiative #${targetId}...</p>`;
-
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${targetId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          body: JSON.stringify(updatedData),
-        },
-      );
-
-      if (!response.ok) throw new Error("Failed to update data.");
-
-      const serverResponse = await response.json();
-      console.log("Update Confirmed:", serverResponse);
-
-      feedbackMessage.innerHTML = `<p style="color: blue;">🔄 Initiative #${targetId} updated successfully!</p>`;
-    } catch (error) {
-      console.error(error);
-      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
-    }
-  }
-
-  async function deleteInitiative(targetId) {
-    try {
-      feedbackMessage.innerHTML = `<p class="loading-text">Deleting initiative #${targetId}...</p>`;
-
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${targetId}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) throw new Error("Failed to delete data.");
-
-      console.log(`Initiative #${targetId} destroyed.`);
-
-      feedbackMessage.innerHTML = `<p style="color: red;">🗑️ Initiative #${targetId} was permanently deleted.</p>`;
-    } catch (error) {
-      console.error(error);
-      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
-    }
-  }
-
-  updateBtn.addEventListener("click", () => {
-    const payload = {
-      id: 1,
-      title: "StoreLane V2 Architecture [UPDATED]",
-      body: "Revised specifications for the hyperlocal platform.",
-      userId: 1,
-    };
-    updateInitiative(1, payload);
-  });
-
-  deleteBtn.addEventListener("click", () => {
-    const isConfirmed = window.confirm(
-      "WARNING: Are you sure you want to delete this? This cannot be undone.",
-    );
-    if (isConfirmed) {
-      deleteInitiative(1);
-    }
-  });
-}
-// --- Day 31: Pagination & Infinite Scroll ---
-function initInfiniteScrollFeed() {
-  const feedContainer = document.getElementById("data-feed");
-  const sentinel = document.getElementById("scroll-sentinel");
-  if (!feedContainer || !sentinel) return;
-
-  let currentPage = 1;
-  const limit = 10;
-  let isLoading = false;
-  let hasMoreData = true;
-
-  async function fetchNextPage() {
-    if (isLoading || !hasMoreData) return;
-    isLoading = true;
-
-    try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}&_limit=${limit}`,
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch data.");
-
-      const data = await response.json();
-
-      if (data.length === 0) {
-        hasMoreData = false;
-        sentinel.textContent = "You've reached the end of the feed.";
-        feedScrollObserver.disconnect();
-        return;
-      }
-
-      data.forEach((item) => {
-        const cardHTML = `
-                    <div class="feed-card">
-                        <h4>${item.id}. ${item.title}</h4>
-                        <p>${item.body}</p>
-                    </div>
-                `;
-        feedContainer.innerHTML += cardHTML;
-      });
-    } catch (error) {
-      console.error("Pagination Error:", error);
-      sentinel.textContent = "Error loading more items.";
-    } finally {
-      isLoading = false;
-    }
-  }
-
-  const feedScrollObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          currentPage++;
-          fetchNextPage();
-        }
-      });
-    },
-    { rootMargin: "100px" },
-  );
-
-  fetchNextPage();
-  feedScrollObserver.observe(sentinel);
-}
