@@ -1,25 +1,67 @@
 /* ========================================== */
-/* api.js: Network Requests                   */
+/* api.js: All Network Requests                */
 /* ========================================== */
 
-// We export this function so main.js can call it
-export async function fetchUserData(username) {
-    try {
-        const response = await fetch(`https://api.github.com/users/${username}`);
-        
-        if (response.status === 403 || response.status === 429) {
-            throw new Error("API Rate Limit exceeded.");
-        }
-        
-        if (!response.ok) {
-            throw new Error("User not found.");
-        }
+export async function fetchGithubUser(username, signal) {
+  const response = await fetch(`https://api.github.com/users/${username}`, {
+    signal,
+  });
+  if (response.status === 403 || response.status === 429) {
+    throw new Error(
+      "API Rate Limit exceeded! You searched too many times. Take a breath.",
+    );
+  }
+  if (!response.ok) throw new Error("Developer not found.");
+  return await response.json();
+}
 
-        // Return the data back to whoever called this function
-        return await response.json();
+export async function fetchGithubRepos(username, signal) {
+  const response = await fetch(
+    `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`,
+    { signal },
+  );
+  if (!response.ok) throw new Error("Could not fetch repositories.");
+  return await response.json();
+}
 
-    } catch (error) {
-        // We throw the error upwards so main.js can decide how to show it on the UI
-        throw error; 
-    }
+export async function postProposal(data) {
+  const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (response.status !== 201)
+    throw new Error(`Server responded with status ${response.status}`);
+  return result;
+}
+
+export async function updateProposal(id, data) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+      body: JSON.stringify(data),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to update data.");
+  return await response.json();
+}
+
+export async function deleteProposal(id) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    { method: "DELETE" },
+  );
+  if (!response.ok) throw new Error("Failed to delete data.");
+  return await response.json();
+}
+
+export async function fetchPostsPage(page, limit) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`,
+  );
+  if (!response.ok) throw new Error("Failed to fetch data.");
+  return await response.json();
 }
