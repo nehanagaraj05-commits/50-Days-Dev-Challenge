@@ -393,6 +393,7 @@ function router() {
     initDevLookup();
     initProposalForm();
     initProposalManagement();
+    initInfiniteScrollFeed();
   }
 }
 
@@ -662,4 +663,67 @@ function initProposalManagement() {
       deleteInitiative(1);
     }
   });
+}
+// --- Day 31: Pagination & Infinite Scroll ---
+function initInfiniteScrollFeed() {
+  const feedContainer = document.getElementById("data-feed");
+  const sentinel = document.getElementById("scroll-sentinel");
+  if (!feedContainer || !sentinel) return;
+
+  let currentPage = 1;
+  const limit = 10;
+  let isLoading = false;
+  let hasMoreData = true;
+
+  async function fetchNextPage() {
+    if (isLoading || !hasMoreData) return;
+    isLoading = true;
+
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}&_limit=${limit}`,
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch data.");
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        hasMoreData = false;
+        sentinel.textContent = "You've reached the end of the feed.";
+        feedScrollObserver.disconnect();
+        return;
+      }
+
+      data.forEach((item) => {
+        const cardHTML = `
+                    <div class="feed-card">
+                        <h4>${item.id}. ${item.title}</h4>
+                        <p>${item.body}</p>
+                    </div>
+                `;
+        feedContainer.innerHTML += cardHTML;
+      });
+    } catch (error) {
+      console.error("Pagination Error:", error);
+      sentinel.textContent = "Error loading more items.";
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  const feedScrollObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          currentPage++;
+          fetchNextPage();
+        }
+      });
+    },
+    { rootMargin: "100px" },
+  );
+
+  fetchNextPage();
+  feedScrollObserver.observe(sentinel);
 }
