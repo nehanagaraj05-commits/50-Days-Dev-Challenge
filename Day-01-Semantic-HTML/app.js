@@ -392,6 +392,7 @@ function router() {
     initFormValidation();
     initDevLookup();
     initProposalForm();
+    initProposalManagement();
   }
 }
 
@@ -584,6 +585,81 @@ function initProposalForm() {
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Proposal";
+    }
+  });
+}
+// --- Day 30: Full CRUD - PUT & DELETE Requests ---
+function initProposalManagement() {
+  const updateBtn = document.getElementById("update-btn");
+  const deleteBtn = document.getElementById("delete-btn");
+  const feedbackMessage = document.getElementById("manage-feedback");
+  if (!updateBtn || !deleteBtn || !feedbackMessage) return;
+
+  async function updateInitiative(targetId, updatedData) {
+    try {
+      feedbackMessage.innerHTML = `<p class="loading-text">Updating initiative #${targetId}...</p>`;
+
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts/${targetId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(updatedData),
+        },
+      );
+
+      if (!response.ok) throw new Error("Failed to update data.");
+
+      const serverResponse = await response.json();
+      console.log("Update Confirmed:", serverResponse);
+
+      feedbackMessage.innerHTML = `<p style="color: blue;">🔄 Initiative #${targetId} updated successfully!</p>`;
+    } catch (error) {
+      console.error(error);
+      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
+    }
+  }
+
+  async function deleteInitiative(targetId) {
+    try {
+      feedbackMessage.innerHTML = `<p class="loading-text">Deleting initiative #${targetId}...</p>`;
+
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts/${targetId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) throw new Error("Failed to delete data.");
+
+      console.log(`Initiative #${targetId} destroyed.`);
+
+      feedbackMessage.innerHTML = `<p style="color: red;">🗑️ Initiative #${targetId} was permanently deleted.</p>`;
+    } catch (error) {
+      console.error(error);
+      feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;
+    }
+  }
+
+  updateBtn.addEventListener("click", () => {
+    const payload = {
+      id: 1,
+      title: "StoreLane V2 Architecture [UPDATED]",
+      body: "Revised specifications for the hyperlocal platform.",
+      userId: 1,
+    };
+    updateInitiative(1, payload);
+  });
+
+  deleteBtn.addEventListener("click", () => {
+    const isConfirmed = window.confirm(
+      "WARNING: Are you sure you want to delete this? This cannot be undone.",
+    );
+    if (isConfirmed) {
+      deleteInitiative(1);
     }
   });
 }

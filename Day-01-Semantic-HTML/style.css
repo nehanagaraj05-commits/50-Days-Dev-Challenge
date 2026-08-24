@@ -664,3 +664,43 @@ footer a:hover {
   color: #22c55e;
   font-weight: 600;
 }
+#manage-proposal {
+  padding: 60px 50px;
+  text-align: center;
+}
+
+.manage-btn-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.btn-danger:disabled,
+.btn-cta:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#manage-feedback {
+  max-width: 500px;
+  margin: 15px auto 0;
+}
