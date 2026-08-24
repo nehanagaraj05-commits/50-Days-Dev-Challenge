@@ -2,14 +2,14 @@
 /* api.js: All Network Requests + Caching     */
 /* ========================================== */
 
-// 1. THE MEMORY BANK — lives only inside this module, invisible to main.js
+import { fetchWithRetry } from "./utils.js";
+
 const userCache = new Map();
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function fetchGithubUser(username, signal) {
   const safeUsername = username.toLowerCase();
 
-  // 2. THE CACHE INTERCEPT (with TTL check)
   if (userCache.has(safeUsername)) {
     const cached = userCache.get(safeUsername);
     const isExpired = Date.now() - cached.timestamp > CACHE_TTL_MS;
@@ -25,9 +25,10 @@ export async function fetchGithubUser(username, signal) {
 
   console.log(`📡 Fetching [${safeUsername}] from external server...`);
 
-  const response = await fetch(`https://api.github.com/users/${safeUsername}`, {
-    signal,
-  });
+  const response = await fetchWithRetry(
+    `https://api.github.com/users/${safeUsername}`,
+    { signal },
+  );
 
   if (response.status === 403 || response.status === 429) {
     throw new Error(
@@ -39,15 +40,13 @@ export async function fetchGithubUser(username, signal) {
   }
 
   const data = await response.json();
-
-  // 3. SAVE TO MEMORY — only on success, never cache a failed/thrown response
   userCache.set(safeUsername, { data, timestamp: Date.now() });
 
   return data;
 }
 
 export async function fetchGithubRepos(username, signal) {
-  const response = await fetch(
+  const response = await fetchWithRetry(
     `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`,
     { signal },
   );
