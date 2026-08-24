@@ -10,6 +10,7 @@ import {
   updateProposal,
   deleteProposal,
   fetchPostsPage,
+  secureDeleteResource,
 } from "./api.js";
 
 // ==========================================
@@ -490,8 +491,8 @@ function initProposalManagement() {
     if (!isConfirmed) return;
 
     try {
-      feedbackMessage.innerHTML = `<p class="loading-text">Deleting initiative #1...</p>`;
-      await deleteProposal(1);
+      feedbackMessage.innerHTML = `<p class="loading-text">Authenticating and deleting initiative #1...</p>`;
+      await secureDeleteResource(1);
       feedbackMessage.innerHTML = `<p style="color: red;">🗑️ Initiative #1 was permanently deleted.</p>`;
     } catch (error) {
       feedbackMessage.innerHTML = `<p style="color: red;">⚠️ ${error.message}</p>`;

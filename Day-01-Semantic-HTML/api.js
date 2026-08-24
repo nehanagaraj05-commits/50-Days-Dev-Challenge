@@ -95,3 +95,56 @@ export async function fetchPostsPage(page, limit) {
   if (!response.ok) throw new Error("Failed to fetch data.");
   return await response.json();
 }
+
+// ==========================================
+// Day 35: Authentication - Bearer Tokens
+// ==========================================
+
+function getAuthHeaders() {
+  const token = localStorage.getItem("auth_token");
+
+  if (!token) {
+    throw new Error(
+      "Access Denied: No authentication token found. Please log in.",
+    );
+  }
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+export async function secureDeleteResource(targetId) {
+  console.log(`🔒 Initiating secure deletion for resource #${targetId}...`);
+
+  const headers = getAuthHeaders(); // throws immediately if no token
+
+  const response = await fetchWithRetry(
+    `https://jsonplaceholder.typicode.com/posts/${targetId}`,
+    {
+      method: "DELETE",
+      headers: headers,
+    },
+  );
+
+  if (response.status === 401) {
+    localStorage.removeItem("auth_token");
+    throw new Error(
+      "Unauthorized: Your session has expired. Please log in again.",
+    );
+  }
+
+  if (response.status === 403) {
+    throw new Error(
+      "Forbidden: You do not have permission to delete this resource.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(`Server Error: ${response.status}`);
+  }
+
+  console.log(`✅ Resource #${targetId} securely deleted.`);
+  return true;
+}
