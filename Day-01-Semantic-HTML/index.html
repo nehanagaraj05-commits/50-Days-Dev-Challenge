@@ -18,7 +18,7 @@
 
     <!-- CSS Link (For Day 02, leaving it commented out for now) -->
     <!-- <link rel="stylesheet" href="style.css"> -->
-    <script src="script.js" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
     <!-- ========================================== -->
@@ -47,7 +47,7 @@
     </header>
 
     <!-- Hint: Start with your Header and Navigation! -->
-    <main role="main" id="main-content">
+    <main role="main" id="app-root">
       <section id="home">
         <h1>Empowering the Next Generation of Engineers</h1>
         <a href="#initiatives" class="btn-cta">Explore Our Initiatives</a>
@@ -165,6 +165,81 @@
 
           <button type="submit" class="btn-submit">Submit Application</button>
         </form>
+      </section>
+      <section id="kanban-board">
+        <h2>Kanban Board</h2>
+        <div class="kanban-columns">
+          <div class="kanban-column" data-status="todo">
+            <h3>To Do</h3>
+            <div class="task-list">
+              <div class="task-card" draggable="true">
+                Design the landing page
+              </div>
+              <div class="task-card" draggable="true">Write API docs</div>
+            </div>
+          </div>
+
+          <div class="kanban-column" data-status="progress">
+            <h3>In Progress</h3>
+            <div class="task-list">
+              <div class="task-card" draggable="true">Fix search bug</div>
+            </div>
+          </div>
+
+          <div class="kanban-column" data-status="done">
+            <h3>Done</h3>
+            <div class="task-list">
+              <div class="task-card" draggable="true">Setup repo</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="dev-lookup">
+        <h2>Community Contributor Lookup</h2>
+        <div class="lookup-input-row">
+          <input
+            type="text"
+            id="github-username"
+            placeholder="Enter GitHub username"
+          />
+        </div>
+        <div id="dev-profile-card"></div>
+        <div id="repos-grid" class="initiatives-grid"></div>
+      </section>
+      <section id="propose-initiative">
+        <h2>Propose an Initiative</h2>
+        <form id="proposal-form" class="membership-form">
+          <div class="form-group">
+            <label for="proposal-title"
+              >Title <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="proposal-title"
+              name="title"
+              placeholder="Project name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="proposal-description"
+              >Description <span class="required">*</span></label
+            >
+            <textarea
+              id="proposal-description"
+              name="description"
+              rows="4"
+              placeholder="What problem does this solve?"
+              required
+            ></textarea>
+          </div>
+
+          <button type="submit" id="proposal-submit-btn" class="btn-submit">
+            Submit Proposal
+          </button>
+        </form>
+        <div id="proposal-feedback"></div>
       </section>
     </main>
 
