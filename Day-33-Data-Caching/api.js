@@ -1,47 +1,98 @@
 /* ========================================== */
-/* api.js: Network Requests & Caching         */
+/* api.js: All Network Requests + Caching     */
 /* ========================================== */
 
-// 1. THE MEMORY BANK
-// This variable lives entirely inside this module. It cannot be touched by main.js!
-const apiCache = new Map();
+// 1. THE MEMORY BANK — lives only inside this module, invisible to main.js
+const userCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export async function fetchUserData(username) {
-    
-    // Normalize the username just in case
-    const safeUsername = username.toLowerCase();
+export async function fetchGithubUser(username, signal) {
+  const safeUsername = username.toLowerCase();
 
-    // 2. THE CACHE INTERCEPT
-    // Gatekeeper: Do we already have this data?
-    if (apiCache.has(safeUsername)) {
-        console.log(`⚡ Serving [${safeUsername}] from local cache!`);
-        
-        // Return the saved data instantly, bypassing the network entirely
-        return apiCache.get(safeUsername);
+  // 2. THE CACHE INTERCEPT (with TTL check)
+  if (userCache.has(safeUsername)) {
+    const cached = userCache.get(safeUsername);
+    const isExpired = Date.now() - cached.timestamp > CACHE_TTL_MS;
+
+    if (!isExpired) {
+      console.log(`⚡ Serving [${safeUsername}] from local cache!`);
+      return cached.data;
+    } else {
+      console.log(`⏳ Cache expired for [${safeUsername}], refetching...`);
+      userCache.delete(safeUsername);
     }
+  }
 
-    console.log(`📡 Fetching [${safeUsername}] from external server...`);
+  console.log(`📡 Fetching [${safeUsername}] from external server...`);
 
-    try {
-        const response = await fetch(`https://api.github.com/users/${safeUsername}`);
-        
-        if (response.status === 403 || response.status === 429) {
-            throw new Error("API Rate Limit exceeded.");
-        }
-        
-        if (!response.ok) {
-            throw new Error("User not found.");
-        }
+  const response = await fetch(`https://api.github.com/users/${safeUsername}`, {
+    signal,
+  });
 
-        const data = await response.json();
+  if (response.status === 403 || response.status === 429) {
+    throw new Error(
+      "API Rate Limit exceeded! You searched too many times. Take a breath.",
+    );
+  }
+  if (!response.ok) {
+    throw new Error("Developer not found.");
+  }
 
-        // 3. SAVE TO MEMORY
-        // If the fetch was successful, save the payload for next time
-        apiCache.set(safeUsername, data);
+  const data = await response.json();
 
-        return data;
+  // 3. SAVE TO MEMORY — only on success, never cache a failed/thrown response
+  userCache.set(safeUsername, { data, timestamp: Date.now() });
 
-    } catch (error) {
-        throw error; 
-    }
+  return data;
+}
+
+export async function fetchGithubRepos(username, signal) {
+  const response = await fetch(
+    `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`,
+    { signal },
+  );
+  if (!response.ok) throw new Error("Could not fetch repositories.");
+  return await response.json();
+}
+
+export async function postProposal(data) {
+  const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (response.status !== 201)
+    throw new Error(`Server responded with status ${response.status}`);
+  return result;
+}
+
+export async function updateProposal(id, data) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+      body: JSON.stringify(data),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to update data.");
+  return await response.json();
+}
+
+export async function deleteProposal(id) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    { method: "DELETE" },
+  );
+  if (!response.ok) throw new Error("Failed to delete data.");
+  return await response.json();
+}
+
+export async function fetchPostsPage(page, limit) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`,
+  );
+  if (!response.ok) throw new Error("Failed to fetch data.");
+  return await response.json();
 }
