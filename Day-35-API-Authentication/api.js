@@ -1,62 +1,150 @@
 /* ========================================== */
-/* api.js: Network Requests & Authentication  */
+/* api.js: All Network Requests + Caching     */
 /* ========================================== */
 
-// Import our resilient fetch wrapper from yesterday
-import { fetchWithRetry } from './utils.js';
+import { fetchWithRetry } from "./utils.js";
 
-// 1. THE AUTHENTICATION UTILITY
-// A helper function to dry up our code so we don't rewrite this everywhere
-function getAuthHeaders() {
-    const token = localStorage.getItem('auth_token');
-    
-    if (!token) {
-        // If they aren't logged in, stop them here.
-        throw new Error("Access Denied: No authentication token found. Please log in.");
+const userCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
+export async function fetchGithubUser(username, signal) {
+  const safeUsername = username.toLowerCase();
+
+  if (userCache.has(safeUsername)) {
+    const cached = userCache.get(safeUsername);
+    const isExpired = Date.now() - cached.timestamp > CACHE_TTL_MS;
+
+    if (!isExpired) {
+      console.log(`⚡ Serving [${safeUsername}] from local cache!`);
+      return cached.data;
+    } else {
+      console.log(`⏳ Cache expired for [${safeUsername}], refetching...`);
+      userCache.delete(safeUsername);
     }
+  }
 
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // The industry standard formatting
-    };
+  console.log(`📡 Fetching [${safeUsername}] from external server...`);
+
+  const response = await fetchWithRetry(
+    `https://api.github.com/users/${safeUsername}`,
+    { signal },
+  );
+
+  if (response.status === 403 || response.status === 429) {
+    throw new Error(
+      "API Rate Limit exceeded! You searched too many times. Take a breath.",
+    );
+  }
+  if (!response.ok) {
+    throw new Error("Developer not found.");
+  }
+
+  const data = await response.json();
+  userCache.set(safeUsername, { data, timestamp: Date.now() });
+
+  return data;
 }
 
-// 2. THE SECURE DELETE FUNCTION
+export async function fetchGithubRepos(username, signal) {
+  const response = await fetchWithRetry(
+    `https://api.github.com/users/${username}/repos?sort=updated&per_page=6`,
+    { signal },
+  );
+  if (!response.ok) throw new Error("Could not fetch repositories.");
+  return await response.json();
+}
+
+export async function postProposal(data) {
+  const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (response.status !== 201)
+    throw new Error(`Server responded with status ${response.status}`);
+  return result;
+}
+
+export async function updateProposal(id, data) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+      body: JSON.stringify(data),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to update data.");
+  return await response.json();
+}
+
+export async function deleteProposal(id) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`,
+    { method: "DELETE" },
+  );
+  if (!response.ok) throw new Error("Failed to delete data.");
+  return await response.json();
+}
+
+export async function fetchPostsPage(page, limit) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`,
+  );
+  if (!response.ok) throw new Error("Failed to fetch data.");
+  return await response.json();
+}
+
+// ==========================================
+// Day 35: Authentication - Bearer Tokens
+// ==========================================
+
+function getAuthHeaders() {
+  const token = localStorage.getItem("auth_token");
+
+  if (!token) {
+    throw new Error(
+      "Access Denied: No authentication token found. Please log in.",
+    );
+  }
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 export async function secureDeleteResource(targetId) {
-    try {
-        console.log(`🔒 Initiating secure deletion for resource #${targetId}...`);
+  console.log(`🔒 Initiating secure deletion for resource #${targetId}...`);
 
-        // Generate the secure headers (this will throw an error if no token exists)
-        const headers = getAuthHeaders();
+  const headers = getAuthHeaders(); // throws immediately if no token
 
-        // 3. THE SECURE FETCH
-        const response = await fetchWithRetry(`https://jsonplaceholder.typicode.com/posts/${targetId}`, {
-            method: 'DELETE',
-            headers: headers
-        });
+  const response = await fetchWithRetry(
+    `https://jsonplaceholder.typicode.com/posts/${targetId}`,
+    {
+      method: "DELETE",
+      headers: headers,
+    },
+  );
 
-        // 4. SECURITY GATEKEEPING
-        if (response.status === 401) {
-            // 401 means the token is invalid, tampered with, or expired
-            // Usually, you would automatically trigger a "logout" function here!
-            localStorage.removeItem('auth_token');
-            throw new Error("Unauthorized: Your session has expired. Please log in again.");
-        }
+  if (response.status === 401) {
+    localStorage.removeItem("auth_token");
+    throw new Error(
+      "Unauthorized: Your session has expired. Please log in again.",
+    );
+  }
 
-        if (response.status === 403) {
-            // 403 means they are logged in, but don't have ADMIN rights to do this
-            throw new Error("Forbidden: You do not have permission to delete this resource.");
-        }
+  if (response.status === 403) {
+    throw new Error(
+      "Forbidden: You do not have permission to delete this resource.",
+    );
+  }
 
-        if (!response.ok) {
-            throw new Error(`Server Error: ${response.status}`);
-        }
+  if (!response.ok) {
+    throw new Error(`Server Error: ${response.status}`);
+  }
 
-        console.log(`✅ Resource #${targetId} securely deleted.`);
-        return true;
-
-    } catch (error) {
-        console.error("Security/Network Error:", error);
-        throw error;
-    }
+  console.log(`✅ Resource #${targetId} securely deleted.`);
+  return true;
 }
