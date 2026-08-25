@@ -343,7 +343,7 @@ function initKanbanBoard() {
   });
 }
 
-// --- Day 26+27+28: Dev Lookup (now using api.js) ---
+// --- Day 26+27+28+36: Dev Lookup with URL Deep Linking ---
 function initDevLookup() {
   const usernameInput = document.getElementById("github-username");
   const profileContainer = document.getElementById("dev-profile-card");
@@ -351,6 +351,16 @@ function initDevLookup() {
   if (!usernameInput || !profileContainer || !reposGrid) return;
 
   let currentController = null;
+
+  function updateURLParameter(key, value) {
+    const url = new URL(window.location);
+    if (value) {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+    window.history.pushState({}, "", url);
+  }
 
   async function loadRepos(username, signal) {
     reposGrid.innerHTML = `<p class="loading-text">Loading repositories...</p>`;
@@ -382,8 +392,8 @@ function initDevLookup() {
     }
   }
 
-  async function loadContributor() {
-    const username = usernameInput.value.trim();
+  async function loadContributor(forcedUsername) {
+    const username = forcedUsername || usernameInput.value.trim();
 
     if (currentController) currentController.abort();
     currentController = new AbortController();
@@ -392,8 +402,11 @@ function initDevLookup() {
     if (username === "") {
       profileContainer.innerHTML = "";
       reposGrid.innerHTML = "";
+      updateURLParameter("user", null); // Bonus: keep the address bar clean
       return;
     }
+
+    if (forcedUsername) usernameInput.value = forcedUsername; // hydration case: reflect it in the input
 
     profileContainer.innerHTML = `<p class="loading-text">Searching for ${username}...</p>`;
     reposGrid.innerHTML = "";
@@ -408,6 +421,7 @@ function initDevLookup() {
                     <a href="${data.html_url}" target="_blank" class="btn-cta">View GitHub</a>
                 </div>
             `;
+      updateURLParameter("user", username); // sync URL only on a successful search
       loadRepos(username, signal);
     } catch (error) {
       if (error.name === "AbortError") return;
@@ -415,8 +429,15 @@ function initDevLookup() {
     }
   }
 
-  const optimizedSearch = debounce(loadContributor, 500);
+  const optimizedSearch = debounce(() => loadContributor(), 500);
   usernameInput.addEventListener("input", optimizedSearch);
+
+  // Day 36: Hydrate from URL on load — runs every time this section renders (i.e. on "/")
+  const params = new URLSearchParams(window.location.search);
+  const userFromURL = params.get("user");
+  if (userFromURL) {
+    loadContributor(userFromURL);
+  }
 }
 
 // --- Day 29: Proposal Form (now using api.js) ---
