@@ -148,3 +148,36 @@ export async function secureDeleteResource(targetId) {
   console.log(`✅ Resource #${targetId} securely deleted.`);
   return true;
 }
+// ==========================================
+// Day 37: Parallel Network Architecture
+// ==========================================
+
+export async function fetchDashboardData(username) {
+  const safeUsername = username.toLowerCase();
+  console.log(`📡 Dispatching parallel requests for [${safeUsername}]...`);
+
+  const profileReq = fetchWithRetry(
+    `https://api.github.com/users/${safeUsername}`,
+  );
+  const reposReq = fetchWithRetry(
+    `https://api.github.com/users/${safeUsername}/repos?sort=updated&per_page=3`,
+  );
+  const followersReq = fetchWithRetry(
+    `https://api.github.com/users/${safeUsername}/followers?per_page=5`,
+  );
+
+  const responses = await Promise.all([profileReq, reposReq, followersReq]);
+
+  responses.forEach((res) => {
+    if (!res.ok) throw new Error("A network request failed.");
+  });
+
+  const parsedData = await Promise.all(responses.map((res) => res.json()));
+  const [profile, repos, followers] = parsedData;
+
+  return {
+    profile: profile,
+    recentRepos: repos,
+    recentFollowers: followers,
+  };
+}

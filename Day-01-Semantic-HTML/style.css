@@ -732,3 +732,42 @@ footer a:hover {
   color: #777;
   font-style: italic;
 }
+#dashboard {
+  padding: 60px 50px;
+  text-align: center;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header img {
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.dash-repo-grid,
+.dash-follower-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dash-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  width: 200px;
+  background-color: var(--card-bg);
+  text-align: left;
+}
+
+.dash-follower-item {
+  text-align: center;
+}
+
+.dash-follower-item img {
+  border-radius: 50%;
+}

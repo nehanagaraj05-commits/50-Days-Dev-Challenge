@@ -11,6 +11,7 @@ import {
   deleteProposal,
   fetchPostsPage,
   secureDeleteResource,
+  fetchDashboardData,
 } from "./api.js";
 
 // ==========================================
@@ -439,7 +440,71 @@ function initDevLookup() {
     loadContributor(userFromURL);
   }
 }
+// --- Day 37: Parallel Dashboard (Promise.all) ---
+function initDashboard() {
+  const searchInput = document.getElementById("dashboard-search");
+  const dashboardContainer = document.getElementById("dashboard-view");
+  if (!searchInput || !dashboardContainer) return;
 
+  async function renderDashboard() {
+    const username = searchInput.value.trim();
+    if (!username) {
+      dashboardContainer.innerHTML = "";
+      return;
+    }
+
+    dashboardContainer.innerHTML = `<p class="loading-text">Assembling dashboard...</p>`;
+
+    try {
+      const dashboard = await fetchDashboardData(username);
+
+      let html = `
+                <div class="dashboard-header">
+                    <img src="${dashboard.profile.avatar_url}" width="80" alt="${dashboard.profile.login}'s avatar">
+                    <h3>${dashboard.profile.name || dashboard.profile.login}</h3>
+                    <p>Total Repos: ${dashboard.profile.public_repos} | Followers: ${dashboard.profile.followers}</p>
+                </div>
+                <h4>Recent Work</h4>
+                <div class="dash-repo-grid">
+            `;
+
+      if (dashboard.recentRepos.length === 0) {
+        html += `<p>No public repositories found.</p>`;
+      } else {
+        dashboard.recentRepos.forEach((repo) => {
+          html += `
+                        <div class="dash-card">
+                            <h4>${repo.name}</h4>
+                            <p style="font-size: 0.8rem;">${repo.description || "No description"}</p>
+                        </div>
+                    `;
+        });
+      }
+
+      html += `</div><h4>Recent Followers</h4><div class="dash-follower-list">`;
+
+      if (dashboard.recentFollowers.length === 0) {
+        html += `<p>No followers found.</p>`;
+      } else {
+        dashboard.recentFollowers.forEach((follower) => {
+          html += `
+                        <div class="dash-follower-item">
+                            <img src="${follower.avatar_url}" width="40" alt="${follower.login}">
+                            <p style="font-size: 0.7rem;">${follower.login}</p>
+                        </div>
+                    `;
+        });
+      }
+
+      html += `</div>`;
+      dashboardContainer.innerHTML = html;
+    } catch (error) {
+      dashboardContainer.innerHTML = `<p class="error-text">⚠️ ${error.message}</p>`;
+    }
+  }
+
+  searchInput.addEventListener("input", debounce(renderDashboard, 600));
+}
 // --- Day 29: Proposal Form (now using api.js) ---
 function initProposalForm() {
   const proposalForm = document.getElementById("proposal-form");
@@ -617,6 +682,7 @@ function router() {
     initProposalForm();
     initProposalManagement();
     initInfiniteScrollFeed();
+    initDashboard();
   }
 }
 
