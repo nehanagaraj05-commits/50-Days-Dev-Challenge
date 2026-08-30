@@ -709,6 +709,7 @@ function router() {
     initInfiniteScrollFeed();
     initDashboard();
     initLiveTerminal();
+    initWorkerDemo();
   }
 }
 
@@ -769,3 +770,55 @@ window.addEventListener("online", async () => {
     console.log("No offline data pending sync.");
   }
 });
+// --- Day 41: Web Worker Multithreading Demo ---
+function initWorkerDemo() {
+  const processBtn = document.getElementById("process-btn");
+  const terminateBtn = document.getElementById("terminate-btn");
+  const outputDisplay = document.getElementById("computation-output");
+  if (!processBtn || !terminateBtn || !outputDisplay) return;
+
+  if (!window.Worker) {
+    console.error("Web Workers are not supported in your browser.");
+    return;
+  }
+
+  let backgroundWorker;
+
+  function attachWorkerListener(worker) {
+    worker.onmessage = function (event) {
+      const payload = event.data;
+      if (payload.status === "SUCCESS") {
+        console.log("🖥️ [Main] Result received from Worker:", payload.data);
+        outputDisplay.innerHTML = `<p style="color: green;">✅ Math Complete: ${payload.data}</p>`;
+        processBtn.disabled = false;
+        processBtn.textContent = "Run Heavy Process";
+      }
+    };
+  }
+
+  function createWorker() {
+    backgroundWorker = new Worker("./worker.js");
+    attachWorkerListener(backgroundWorker); // fixes the missing re-attach bug
+    return backgroundWorker;
+  }
+
+  createWorker();
+
+  processBtn.addEventListener("click", () => {
+    outputDisplay.innerHTML = `<p class="loading-text">Processing 2 billion iterations in the background... Notice the spinner never freezes?</p>`;
+    processBtn.disabled = true;
+    processBtn.textContent = "Processing...";
+    backgroundWorker.postMessage("START_COMPUTATION");
+  });
+
+  terminateBtn.addEventListener("click", () => {
+    console.warn("🖥️ [Main] Terminating the background thread instantly.");
+    backgroundWorker.terminate();
+
+    outputDisplay.innerHTML = `<p style="color: red;">🛑 Process forcibly canceled by user.</p>`;
+    processBtn.disabled = false;
+    processBtn.textContent = "Run Heavy Process";
+
+    createWorker(); // spin up a fresh worker AND re-attach its listener
+  });
+}

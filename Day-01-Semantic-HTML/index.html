@@ -19,6 +19,7 @@
     <!-- CSS Link (For Day 02, leaving it commented out for now) -->
     <!-- <link rel="stylesheet" href="style.css"> -->
     <script type="module" src="main.js"></script>
+    <script type="module" src="components/UserCard.js"></script>
   </head>
   <body>
     <!-- ========================================== -->
@@ -74,37 +75,26 @@
       <section id="core-team">
         <h2>Core Team</h2>
         <div class="team-grid">
-          <div class="profile-card hidden">
-            <img src="anant.jfif" alt="ANANT SHARMA, Founder Synexus" />
-
-            <h3>Anant Sharma</h3>
-            <p>Founder, Synexus</p>
-            <a href="#">View Profile</a>
-          </div>
-          <div class="profile-card hidden">
-            <img
-              src="abhay1.jfif"
-              alt="ABHAY ADITHYA R S, Chief Coordination Officer"
-            />
-            <h3>ABHAY ADITHYA R S</h3>
-            <p>Chief Coordination Officer, Synexus</p>
-            <a href="#">View Profile</a>
-          </div>
-          <div class="profile-card hidden">
-            <img
-              src="pavithra.jfif"
-              alt="P V PAVITHRA, Chief Operating Officer"
-            />
-            <h3>P V PAVITHRA</h3>
-            <p>Chief Operating Officer, Synexus</p>
-            <a href="#">View Profile</a>
-          </div>
-          <div class="profile-card hidden">
-            <img src="harshit.jfif" alt="HARSHIT SINGH, Community Lead" />
-            <h3>HARSHIT SINGH</h3>
-            <p>Community Lead, Synexus</p>
-            <a href="#">View Profile</a>
-          </div>
+          <user-card
+            name="Anant Sharma"
+            role="Founder, Synexus"
+            avatar="anant.jfif"
+          ></user-card>
+          <user-card
+            name="Abhay Adithya R S"
+            role="Chief Coordination Officer, Synexus"
+            avatar="abhay1.jfif"
+          ></user-card>
+          <user-card
+            name="P V Pavithra"
+            role="Chief Operating Officer, Synexus"
+            avatar="pavithra.jfif"
+          ></user-card>
+          <user-card
+            name="Harshit Singh"
+            role="Community Lead, Synexus"
+            avatar="harshit.jfif"
+          ></user-card>
         </div>
       </section>
       <section id="testimonials">
@@ -276,6 +266,15 @@
           <input type="text" id="ws-input" placeholder="Type a message..." />
           <button id="ws-send" class="btn-cta">Send</button>
         </div>
+      </section>
+      <section id="worker-demo">
+        <h2>Background Processing Demo</h2>
+        <div class="spinner"></div>
+        <div class="manage-btn-row">
+          <button id="process-btn" class="btn-cta">Run Heavy Process</button>
+          <button id="terminate-btn" class="btn-danger">Cancel Process</button>
+        </div>
+        <div id="computation-output"></div>
       </section>
     </main>
 
