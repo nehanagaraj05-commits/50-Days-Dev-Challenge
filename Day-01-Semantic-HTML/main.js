@@ -13,7 +13,7 @@ import {
   secureDeleteResource,
   fetchDashboardData,
 } from "./api.js";
-
+import { connectWebSocket, sendLiveMessage } from "./websocket.js";
 // ==========================================
 // 1. GLOBAL UI MODULES
 // ==========================================
@@ -641,6 +641,25 @@ function initInfiniteScrollFeed() {
   fetchNextPage();
   feedScrollObserver.observe(sentinel);
 }
+// --- Day 38: WebSocket Live Terminal ---
+function initLiveTerminal() {
+  const wsInput = document.getElementById("ws-input");
+  const wsSendBtn = document.getElementById("ws-send");
+  if (!wsInput || !wsSendBtn) return;
+
+  wsSendBtn.addEventListener("click", () => {
+    const text = wsInput.value.trim();
+    if (text === "") return;
+    sendLiveMessage(text);
+    wsInput.value = "";
+  });
+
+  wsInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      wsSendBtn.click();
+    }
+  });
+}
 
 // ==========================================
 // 3. THE SPA ROUTER
@@ -683,12 +702,31 @@ function router() {
     initProposalManagement();
     initInfiniteScrollFeed();
     initDashboard();
+    initLiveTerminal();
   }
 }
 
 // ==========================================
 // 4. ENGINE INITIALIZATION
 // ==========================================
+// --- Day 39: Service Worker Registration ---
+window.addEventListener("load", () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then((registration) => {
+        console.log(
+          "✅ Service Worker registered successfully with scope:",
+          registration.scope,
+        );
+      })
+      .catch((error) => {
+        console.error("⚠️ Service Worker registration failed:", error);
+      });
+  } else {
+    console.log("Service Workers are not supported in this browser.");
+  }
+});
 
 function initApp() {
   console.log("Synexus Core Engine: Online (Modular).");
@@ -697,6 +735,7 @@ function initApp() {
 
   initThemeToggle();
   initMobileMenu();
+  connectWebSocket(); // ← add this line, global — connects once
 
   document.body.addEventListener("click", (e) => {
     if (e.target.matches(".nav-link")) {
@@ -710,5 +749,4 @@ function initApp() {
 
   router();
 }
-
 document.addEventListener("DOMContentLoaded", initApp);

@@ -771,3 +771,38 @@ footer a:hover {
 .dash-follower-item img {
   border-radius: 50%;
 }
+#live-terminal {
+  padding: 60px 50px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#connection-status {
+  font-size: 0.9rem;
+  margin-left: 10px;
+}
+
+#live-feed {
+  height: 250px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: left;
+  background-color: var(--card-bg);
+}
+
+.msg {
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+.msg.sent {
+  color: #22c55e;
+}
+
+.msg.received {
+  color: #4b6cb7;
+}
