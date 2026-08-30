@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
   "./api.js",
   "./utils.js",
   "./websocket.js",
+  "./db.js",
 ];
 
 self.addEventListener("install", (event) => {

@@ -3,6 +3,7 @@
 /* ========================================== */
 
 import { debounce } from "./utils.js";
+import { getOfflineData } from "./db.js";
 import {
   fetchGithubUser,
   fetchGithubRepos,
@@ -539,7 +540,12 @@ function initProposalForm() {
       feedbackContainer.innerHTML = `<p class="success-text">✅ Proposal submitted! (ID: ${data.id})</p>`;
       proposalForm.reset();
     } catch (error) {
-      feedbackContainer.innerHTML = `<p class="error-text">⚠️ Failed to submit proposal. Please try again.</p>`;
+      if (error.message === "OFFLINE_SAVED") {
+        feedbackContainer.innerHTML = `<p style="color: orange;">📡 You are offline. Proposal saved securely to your device and will sync later!</p>`;
+        proposalForm.reset();
+      } else {
+        feedbackContainer.innerHTML = `<p class="error-text">⚠️ Failed to submit proposal. Please try again.</p>`;
+      }
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Proposal";
@@ -750,3 +756,16 @@ function initApp() {
   router();
 }
 document.addEventListener("DOMContentLoaded", initApp);
+// --- Day 40 Bonus: Log offline-saved data when back online ---
+window.addEventListener("online", async () => {
+  console.log("🌐 Back online! Checking for offline-saved proposals...");
+  const offlineItems = await getOfflineData();
+  if (offlineItems.length > 0) {
+    console.log(
+      `📦 Found ${offlineItems.length} offline-saved item(s):`,
+      offlineItems,
+    );
+  } else {
+    console.log("No offline data pending sync.");
+  }
+});

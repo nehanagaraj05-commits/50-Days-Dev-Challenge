@@ -3,6 +3,7 @@
 /* ========================================== */
 
 import { fetchWithRetry } from "./utils.js";
+import { saveOfflineData } from "./db.js";
 
 const userCache = new Map();
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -55,6 +56,12 @@ export async function fetchGithubRepos(username, signal) {
 }
 
 export async function postProposal(data) {
+  if (!navigator.onLine) {
+    console.warn("🌐 Network offline. Routing payload to local database.");
+    await saveOfflineData(data);
+    throw new Error("OFFLINE_SAVED");
+  }
+
   const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
     method: "POST",
     headers: { "Content-type": "application/json; charset=UTF-8" },
