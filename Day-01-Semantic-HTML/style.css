@@ -834,3 +834,20 @@ footer a:hover {
   max-width: 500px;
   margin: 15px auto 0;
 }
+#live-stats {
+  padding: 40px 50px;
+  text-align: center;
+}
+
+.flash-update {
+  animation: flashHighlight 0.3s ease;
+}
+
+@keyframes flashHighlight {
+  0% {
+    background-color: var(--accent-color);
+  }
+  100% {
+    background-color: transparent;
+  }
+}

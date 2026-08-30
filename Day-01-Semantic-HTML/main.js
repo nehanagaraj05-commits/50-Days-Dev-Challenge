@@ -4,6 +4,7 @@
 
 import { debounce } from "./utils.js";
 import { getOfflineData } from "./db.js";
+import { globalStore } from "./store.js";
 import {
   fetchGithubUser,
   fetchGithubRepos,
@@ -24,16 +25,19 @@ function initThemeToggle() {
   if (!themeToggleBtn) return;
 
   const currentTheme = localStorage.getItem("synexus_theme");
-  if (currentTheme === "dark") {
+  const isDark = currentTheme === "dark";
+  if (isDark) {
     document.body.classList.add("dark-theme");
     themeToggleBtn.textContent = "☀️";
   }
+  globalStore.setState({ isDarkMode: isDark }); // sync initial state to the store
 
   themeToggleBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark-theme");
-    const isDark = document.body.classList.contains("dark-theme");
-    themeToggleBtn.textContent = isDark ? "☀️" : "🌙";
-    localStorage.setItem("synexus_theme", isDark ? "dark" : "light");
+    const nowDark = document.body.classList.contains("dark-theme");
+    themeToggleBtn.textContent = nowDark ? "☀️" : "🌙";
+    localStorage.setItem("synexus_theme", nowDark ? "dark" : "light");
+    globalStore.setState({ isDarkMode: nowDark }); // publish the change
   });
 }
 
@@ -710,6 +714,7 @@ function router() {
     initDashboard();
     initLiveTerminal();
     initWorkerDemo();
+    initLiveStats();
   }
 }
 
@@ -820,5 +825,20 @@ function initWorkerDemo() {
     processBtn.textContent = "Run Heavy Process";
 
     createWorker(); // spin up a fresh worker AND re-attach its listener
+  });
+}
+// --- Day 43: Global State Subscriber (Live Stats Widget) ---
+function initLiveStats() {
+  const themeStatusDisplay = document.getElementById("theme-status-display");
+  if (!themeStatusDisplay) return;
+
+  // Reflect current state immediately on render
+  const current = globalStore.getState();
+  themeStatusDisplay.textContent = `Current theme (from global store): ${current.isDarkMode ? "Dark 🌙" : "Light ☀️"}`;
+
+  globalStore.subscribe((state) => {
+    themeStatusDisplay.textContent = `Current theme (from global store): ${state.isDarkMode ? "Dark 🌙" : "Light ☀️"}`;
+    themeStatusDisplay.classList.add("flash-update");
+    setTimeout(() => themeStatusDisplay.classList.remove("flash-update"), 300);
   });
 }
