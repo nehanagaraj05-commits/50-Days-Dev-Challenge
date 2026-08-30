@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reactive Architecture</title>
+    
+    <script type="module" src="store.js"></script>
+    <script type="module" src="components/CartCounter.js"></script>
+    <script type="module" src="components/ProductButton.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 2rem;">
+
+    <header style="display: flex; justify-content: space-between; padding-bottom: 1rem; border-bottom: 1px solid #ccc;">
+        <h2>Platform Store</h2>
+        
+        <cart-counter></cart-counter>
+    </header>
+
+    <main style="margin-top: 2rem; display: flex; gap: 1rem;">
+        
+        <product-button product-id="101" product-name="Pro License"></product-button>
+        <product-button product-id="102" product-name="Enterprise License"></product-button>
+        
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Composition</title>
+    
+    <script type="module" src="components/CustomModal.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 2rem;">
+
+    <template id="modal-template">
+        <style>
+            .backdrop {
+                background: rgba(0, 0, 0, 0.05);
+                border: 1px solid #ccc;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin-bottom: 2rem;
+            }
+            .modal-header {
+                border-bottom: 2px solid #eee;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+            }
+            /* The ::slotted selector targets HTML passed in from the outside! */
+            ::slotted(h2) {
+                margin: 0;
+                color: #333;
+                font-size: 1.5rem;
+            }
+        </style>
+        
+        <div class="backdrop">
+            <div class="modal-header">
+                <slot name="title">Default Title Placeholder</slot>
+            </div>
+            
+            <div class="modal-body">
+                <slot>Default body content goes here.</slot>
+            </div>
+        </div>
+    </template>
+
+    <custom-modal>
+        <h2 slot="title" style="color: red;">⚠️ Data Deletion Warning</h2>
+        <p>Are you absolutely sure you want to permanently delete this record?</p>
+        <button>Confirm Delete</button>
+    </custom-modal>
+
+    <custom-modal>
+        <h2 slot="title">🎉 Welcome to the Platform</h2>
+        <p>Your account has been successfully verified. Please set up your profile.</p>
+        <button>Go to Settings</button>
+    </custom-modal>
+
+</body>
+</html>
