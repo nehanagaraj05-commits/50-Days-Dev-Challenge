@@ -3,64 +3,66 @@
 /* ========================================== */
 
 class UserCard extends HTMLElement {
-    constructor() {
-        // Always call super first in a class extending another class
-        super();
-        
-        // Attach the Shadow DOM to protect this component's CSS from the rest of the app
-        this.attachShadow({ mode: 'open' });
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+
+  // Bonus: tells the browser which attributes to watch for live updates
+  static get observedAttributes() {
+    return ["name", "role", "avatar"];
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  // Bonus: fires automatically whenever a watched attribute changes
+  attributeChangedCallback(attrName, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
     }
+  }
 
-    // This lifecycle method runs the exact moment the tag is placed on the screen
-    connectedCallback() {
-        this.render();
-    }
+  render() {
+    const name = this.getAttribute("name") || "Unknown User";
+    const role = this.getAttribute("role") || "Member";
+    const avatar =
+      this.getAttribute("avatar") || "https://via.placeholder.com/150";
 
-    // A custom method to handle painting the UI
-    render() {
-        // Extract the data passed into the HTML attributes
-        // We use logical OR (||) to provide fallbacks if the attribute is missing
-        const name = this.getAttribute('name') || 'Unknown User';
-        const role = this.getAttribute('role') || 'Member';
-        const avatar = this.getAttribute('avatar') || 'https://via.placeholder.com/150';
-
-        // Inject the HTML and the encapsulated CSS into the Shadow DOM
-        this.shadowRoot.innerHTML = `
+    this.shadowRoot.innerHTML = `
             <style>
-                /* This CSS ONLY affects this specific component. It will not leak out! */
                 .card {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-family: 'Inter', Arial, sans-serif;
                     background: #ffffff;
-                    border: 1px solid #e0e0e0;
                     border-radius: 8px;
                     padding: 20px;
-                    width: 250px;
+                    width: 220px;
                     text-align: center;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                    transition: transform 0.2s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
                 }
                 .card:hover {
                     transform: translateY(-5px);
+                    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
                 }
                 .avatar {
-                    width: 80px;
-                    height: 80px;
+                    width: 100px;
+                    height: 100px;
                     border-radius: 50%;
                     object-fit: cover;
-                    border: 3px solid #f0f0f0;
                     margin-bottom: 15px;
                 }
                 h3 {
                     margin: 0 0 5px 0;
                     color: #333;
-                    font-size: 1.2rem;
+                    font-size: 1.1rem;
+                    font-weight: 700;
                 }
                 p {
                     margin: 0;
-                    color: #666;
+                    color: #777;
                     font-size: 0.9rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
                 }
             </style>
 
@@ -70,9 +72,7 @@ class UserCard extends HTMLElement {
                 <p>${role}</p>
             </div>
         `;
-    }
+  }
 }
 
-// Register the class with the browser's custom element registry
-// The tag name MUST contain a hyphen!
-window.customElements.define('user-card', UserCard);
+customElements.define("user-card", UserCard);
