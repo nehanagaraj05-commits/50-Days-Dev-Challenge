@@ -851,3 +851,11 @@ footer a:hover {
     background-color: transparent;
   }
 }
+#reactive-components-demo {
+  padding: 60px 50px;
+  text-align: center;
+}
+
+#cart-counter-slot {
+  margin-bottom: 20px;
+}

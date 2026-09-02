@@ -715,6 +715,7 @@ function router() {
     initLiveTerminal();
     initWorkerDemo();
     initLiveStats();
+    initReactiveComponentsDemo();
   }
 }
 
@@ -840,5 +841,22 @@ function initLiveStats() {
     themeStatusDisplay.textContent = `Current theme (from global store): ${state.isDarkMode ? "Dark 🌙" : "Light ☀️"}`;
     themeStatusDisplay.classList.add("flash-update");
     setTimeout(() => themeStatusDisplay.classList.remove("flash-update"), 300);
+  });
+}
+// --- Day 44: Toggle to demonstrate connected/disconnected lifecycle ---
+function initReactiveComponentsDemo() {
+  const toggleBtn = document.getElementById("toggle-counter-btn");
+  const slot = document.getElementById("cart-counter-slot");
+  if (!toggleBtn || !slot) return;
+
+  let isPresent = true;
+
+  toggleBtn.addEventListener("click", () => {
+    if (isPresent) {
+      slot.innerHTML = ""; // removes <cart-counter>, triggers disconnectedCallback
+    } else {
+      slot.innerHTML = "<cart-counter></cart-counter>"; // re-adds it, triggers connectedCallback again
+    }
+    isPresent = !isPresent;
   });
 }

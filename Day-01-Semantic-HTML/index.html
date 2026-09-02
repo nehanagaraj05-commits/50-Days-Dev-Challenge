@@ -20,6 +20,8 @@
     <!-- <link rel="stylesheet" href="style.css"> -->
     <script type="module" src="main.js"></script>
     <script type="module" src="components/UserCard.js"></script>
+    <script type="module" src="components/CartCounter.js"></script>
+    <script type="module" src="components/ProductButton.js"></script>
   </head>
   <body>
     <!-- ========================================== -->
@@ -279,6 +281,29 @@
       <section id="live-stats">
         <h2>Live Platform Stats</h2>
         <p id="theme-status-display"></p>
+      </section>
+      <section id="reactive-components-demo">
+        <h2>Reactive Components Demo</h2>
+        <div id="cart-counter-slot">
+          <cart-counter></cart-counter>
+        </div>
+        <div class="manage-btn-row">
+          <product-button
+            product-id="101"
+            product-name="Pro License"
+          ></product-button>
+          <product-button
+            product-id="102"
+            product-name="Enterprise License"
+          ></product-button>
+        </div>
+        <button
+          id="toggle-counter-btn"
+          class="btn-cta"
+          style="margin-top: 15px"
+        >
+          Remove/Re-add Counter (test cleanup)
+        </button>
       </section>
     </main>
 
