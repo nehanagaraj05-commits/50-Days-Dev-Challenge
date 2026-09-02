@@ -3,27 +3,37 @@
 /* ========================================== */
 
 class CustomModal extends HTMLElement {
-    constructor() {
-        super();
-        
-        // 1. Attach the Shadow DOM to protect the component
-        this.attachShadow({ mode: 'open' });
-        
-        // 2. Query the main document for the template element
-        const template = document.getElementById('modal-template');
-        
-        // Safety check: Does the template exist in the HTML file?
-        if (template) {
-            // 3. Clone the nodes deeply (true means clone all nested children too)
-            const templateContent = template.content.cloneNode(true);
-            
-            // 4. Inject the clone into the Shadow DOM
-            this.shadowRoot.appendChild(templateContent);
-        } else {
-            console.error("CustomModal Error: Cannot find 'modal-template' in the DOM.");
-        }
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+
+    const template = document.getElementById("modal-template");
+
+    if (template) {
+      const templateContent = template.content.cloneNode(true);
+      this.shadowRoot.appendChild(templateContent);
+    } else {
+      console.error(
+        "CustomModal Error: Cannot find 'modal-template' in the DOM.",
+      );
     }
+  }
+
+  connectedCallback() {
+    const closeBtn = this.shadowRoot.getElementById("internal-close-btn");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => this.close());
+    }
+  }
+
+  // Bonus: open/close via the 'open' attribute, driven by :host([open]) CSS
+  open() {
+    this.setAttribute("open", "");
+  }
+
+  close() {
+    this.removeAttribute("open");
+  }
 }
 
-// Register the custom element
-customElements.define('custom-modal', CustomModal);
+customElements.define("custom-modal", CustomModal);
