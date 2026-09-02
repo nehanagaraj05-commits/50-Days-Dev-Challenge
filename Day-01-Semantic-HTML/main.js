@@ -716,6 +716,7 @@ function router() {
     initWorkerDemo();
     initLiveStats();
     initReactiveComponentsDemo();
+    initModalDemo();
   }
 }
 
@@ -859,4 +860,16 @@ function initReactiveComponentsDemo() {
     }
     isPresent = !isPresent;
   });
+}
+// --- Day 45: Modal Open/Close Triggers ---
+function initModalDemo() {
+  const openDeleteBtn = document.getElementById("open-delete-modal");
+  const openWelcomeBtn = document.getElementById("open-welcome-modal");
+  const deleteModal = document.getElementById("delete-modal");
+  const welcomeModal = document.getElementById("welcome-modal");
+  if (!openDeleteBtn || !openWelcomeBtn || !deleteModal || !welcomeModal)
+    return;
+
+  openDeleteBtn.addEventListener("click", () => deleteModal.open());
+  openWelcomeBtn.addEventListener("click", () => welcomeModal.open());
 }

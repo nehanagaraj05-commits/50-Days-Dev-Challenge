@@ -22,6 +22,7 @@
     <script type="module" src="components/UserCard.js"></script>
     <script type="module" src="components/CartCounter.js"></script>
     <script type="module" src="components/ProductButton.js"></script>
+    <script type="module" src="components/CustomModal.js"></script>
   </head>
   <body>
     <!-- ========================================== -->
@@ -29,6 +30,62 @@
     <!-- ========================================== -->
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <template id="modal-template">
+      <style>
+        :host {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          z-index: 2000;
+          align-items: center;
+          justify-content: center;
+        }
+        :host([open]) {
+          display: flex;
+        }
+        .backdrop {
+          background: var(--card-bg);
+          color: var(--text-color);
+          border-radius: 8px;
+          padding: 1.5rem;
+          max-width: 450px;
+          width: 90%;
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #eee;
+          margin-bottom: 1rem;
+          padding-bottom: 0.5rem;
+        }
+        ::slotted(h2) {
+          margin: 0;
+          font-size: 1.3rem;
+        }
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: var(--text-color);
+        }
+      </style>
+
+      <div class="backdrop">
+        <div class="modal-header">
+          <slot name="title">Default Title Placeholder</slot>
+          <button class="close-btn" id="internal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <slot>Default body content goes here.</slot>
+        </div>
+      </div>
+    </template>
     <header role="banner">
       <nav role="navigation">
         <div class="logo">CommunityPlatform</div>
@@ -304,6 +361,32 @@
         >
           Remove/Re-add Counter (test cleanup)
         </button>
+      </section>
+      <section id="modal-demo">
+        <h2>Composable Modal Demo</h2>
+        <div class="manage-btn-row">
+          <button id="open-delete-modal" class="btn-danger">
+            Show Delete Warning
+          </button>
+          <button id="open-welcome-modal" class="btn-cta">
+            Show Welcome Modal
+          </button>
+        </div>
+
+        <custom-modal id="delete-modal">
+          <h2 slot="title" style="color: #dc2626">⚠️ Data Deletion Warning</h2>
+          <p>
+            Are you absolutely sure you want to permanently delete this record?
+          </p>
+        </custom-modal>
+
+        <custom-modal id="welcome-modal">
+          <h2 slot="title">🎉 Welcome to the Platform</h2>
+          <p>
+            Your account has been successfully verified. Please set up your
+            profile.
+          </p>
+        </custom-modal>
       </section>
     </main>
 
